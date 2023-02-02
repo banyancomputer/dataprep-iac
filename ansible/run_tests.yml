@@ -1,0 +1,40 @@
+# Run our tests
+# Orchestrate and run tests on the host machine
+
+# Usage
+# ansible-playbook -i inventory/localhost run_tests.yml
+# -e test_set_path=/home/dataprep/test_set
+# -e packed_path=/home/dataprep/packed
+# -e unpacked_path=/home/dataprep/unpacked
+# -e manifest_path=/home/dataprep/manifest
+# -e install_path=/home
+
+- become: yes
+  hosts: all
+  name: Run our tests
+  tasks:
+    # Copy our run_tests.sh script to the host
+    - name: Copy our run_tests.sh script to the host
+      copy:
+        src: run_tests.sh
+        dest: "{{ install_path }}/run_tests.sh"
+    # Make sure our run_tests.sh script is executable on the host
+    - name: Make sure our run_tests.sh script is executable on the host
+      file:
+        path: "{{ install_path }}/run_tests.sh"
+        mode: 0755
+    - name: Make an empty directory for our manifests
+      file:
+        path: "{{ manifest_path }}"
+        state: directory
+    - name: Make sure the manifest directory is empty
+      shell: "rm -rf {{ manifest_path }}/*"
+      when: manifest_path_exists is defined and manifest_path_exists.stat.exists
+    # Run our tests
+    # Iterate over the directories in the test set
+    # Run run_tests.sh on the host
+    - name: Run our tests
+      shell: "{{ install_path }}/run_tests.sh {{ test_set_path }} {{ packed_path }} {{ unpacked_path }} {{ manifest_path }}"
+      args:
+        chdir: "{{ install_path }}"
+      when: test_set_path is defined and packed_path is defined and unpacked_path is defined

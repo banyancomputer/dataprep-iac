@@ -1,0 +1,33 @@
+# Install our Rust binaries on the host
+# Requires having Git, Rust, Cargo, and the nightly version of Rust installed on the host
+# Arguments:
+# -e install_path=/home # The directory where we should install our binaries
+
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+  tasks:
+    - name: Clone the dataprep repo
+      git:
+        repo: https://github.com/banyancomputer/dataprep.git
+        dest: ~/dataprep
+        update: yes
+#    - name: Clone the dataprep-shared repo
+#      git:
+#        repo: git@github.com:banayancomputer/dataprep-shared.git
+#        dest: /home/dataprep-shared
+#        update: yes
+    - name: Build production
+      shell: cargo +nightly build --release --manifest-path Cargo.toml
+      args:
+        chdir: ~/dataprep
+    - name: Install the dataprep package
+      shell: cargo +nightly install  --path ./dataprep --root /usr/local
+      args:
+        chdir: ~/dataprep
+#    - name: Install the dataprep-shared package
+#      shell: cargo install --path .
+#      args:
+#          chdir: /home/dataprep-shared

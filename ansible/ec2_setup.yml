@@ -1,0 +1,64 @@
+# Setup and check the Host for Testing Dataprep
+# It should have the following software dependencies:
+# - git
+# - rust
+# We should also check that the host has the following:
+# - has a test set device mounted at {test_set_path}
+# - has a packed device mounted at {packed_path}
+# - has an unpacked device mounted at {unpacked_path}
+
+# Arguments:
+# -e test_set_device=/dev/sdb # The device to use for the test set
+# -e test_set_path=/home/test_set # The directory where the test set exists on its device
+# -e packed_device=/dev/sdc # The device to use for the packed test set
+# -e packed_path=/home/packed # The directory where the packed test set exists on its device
+# -e unpacked_device=/dev/sdd # The device to use for the unpacked test set
+# -e unpacked_path=/home/unpacked # The directory where the unpacked test set exists on its device
+
+- become: yes
+  hosts: all
+  user: root
+  name: Get our Ec2 instance ready for testing
+  tasks:
+    # Install the dependencies
+    - name: Update Yum
+      yum:
+        name: "*"
+        state: latest
+    - name: Install git
+      yum:
+        name: git
+        state: present
+    - name: Install rust
+      yum:
+        name: rustc
+        state: present
+    - name: Install the nightly version of rust
+      shell: rustup toolchain install nightly
+    - name: Check for mounted test set device
+      shell: mount | grep {{ test_set_device }}
+      register: test_set_device_mounted
+      ignore_errors: yes
+      when: test_set_device is defined
+    # Setup devices for holding data
+    - name: Mount the test set device
+      mount:
+        path: "{{ test_set_path }}"
+        src: "{{ test_set_device }}"
+        fstype: ext4
+        state: mounted
+      when: test_set_device_mounted is not defined
+    - name: Mount the packed device
+      mount:
+        path: "{{ packed_path }}"
+        src: "{{ packed_device }}"
+        fstype: ext4
+        state: mounted
+      when: packed_device_mounted is not defined
+    - name: Mount the unpacked device
+      mount:
+        path: "{{ unpacked_path }}"
+        src: "{{ unpacked_device }}"
+        fstype: ext4
+        state: mounted
+      when: unpacked_device_mounted is not defined
