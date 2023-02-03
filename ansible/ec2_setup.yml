@@ -2,11 +2,7 @@
 # It should have the following software dependencies:
 # - git
 # - rust
-# We should also check that the host has the following:
-# - has a test set device mounted at {test_set_path}
-# - has a packed device mounted at {packed_path}
-# - has an unpacked device mounted at {unpacked_path}
-
+# We should also check that the host has the following devices mounted:
 # Arguments:
 # -e test_set_device=/dev/sdb # The device to use for the test set
 # -e test_set_path=/home/test_set # The directory where the test set exists on its device

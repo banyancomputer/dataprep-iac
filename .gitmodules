@@ -1,3 +1,0 @@
-[submodule "dataprep"]
-	path = dataprep
-	url = git@github.com:banyancomputer/dataprep.git

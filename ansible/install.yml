@@ -1,0 +1,78 @@
+# Install our Rust binaries on the host
+# Requires having Git, Rust, Cargo, and the nightly version of Rust installed on the host
+# Arguments:
+# -e install_path=/home # The directory where we should install our binaries
+
+- hosts: all
+  become: yes
+#  become_method: sudo
+#  become_user: root
+  tasks:
+    # Setup a Dataprep user on the host
+    - name: Create a dataprep user
+      user:
+        name: dataprep
+        shell: /bin/bash
+        state: present
+
+    # Install the Dataprep binaries
+    - name: Clone the dataprep repo
+      git:
+        repo: https://github.com/banyancomputer/dataprep.git
+        dest: "{{ install_path }}/dataprep"
+        update: yes
+#    - name: Clone the dataprep-shared repo
+#      git:
+#        repo: git@github.com:banayancomputer/dataprep-shared.git
+#        dest: /home/dataprep-shared
+#        update: yes
+    - name: Build production
+      shell: cargo +nightly build --release --manifest-path Cargo.toml
+      args:
+        chdir: "{{ install_path }}/dataprep"
+    - name: Install the dataprep package
+      shell: cargo +nightly install  --path ./dataprep --root /usr/local
+      args:
+        chdir: "{{ install_path }}/dataprep"
+#    - name: Install the dataprep-shared package
+#      shell: cargo install --path .
+#      args:
+#          chdir: /home/dataprep-shared
+
+    # Make our scripts executable on the host
+    # Copy our population script to the host
+    - name: Copy the population script to the host
+      copy:
+        src: populate.sh
+        dest: "{{ install_path }}/populate.sh"
+    # Make the population script executable
+    - name: Make the population script executable
+      file:
+        path: "{{ install_path }}/populate.sh"
+        mode: 0755
+    # Delete the link if it already exists
+    - name: Delete the link if it already exists
+      file:
+        path: /usr/local/bin/populate
+        state: absent
+    # Make the population script callable from anywhere. Force the link to be created if it already exists.
+    - name: Make the population script callable from anywhere
+      shell: "ln -sf {{ install_path }}/populate.sh /usr/local/bin/populate"
+    # Copy our run script to the host
+    - name: Copy the run script to the host
+      copy:
+        src: run.sh
+        dest: "{{ install_path }}/run.sh"
+    # Make the run script executable
+    - name: Make the run script executable
+      file:
+        path: "{{ install_path }}/run.sh"
+        mode: 0755
+    # Delete the link if it already exists
+    - name: Delete the link if it already exists
+      file:
+        path: /usr/local/bin/run
+        state: absent
+    # Make the run script callable from anywhere
+    - name: Make the run script callable from anywhere
+      shell: "ln -s {{ install_path }}/run.sh /usr/local/bin/run"

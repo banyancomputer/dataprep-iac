@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO (amiller68): Replace this with our cargo binary
+
 # Arguments
 # $1: test_set_path
 # $2: test_set_count

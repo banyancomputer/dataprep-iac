@@ -1,0 +1,14 @@
+# Clone Results to the current working directory
+
+# Usage
+# ansible-playbook -i inventory/localhost
+# -e result_path=/home/dataprep/result
+# -e local_result_path=/home/dataprep/local_result
+# ./result.yml
+
+- become: yes
+  hosts: all
+  name: Run our tests
+  tasks:
+    - name: Clone Results to the current working directory
+      shell: "cp -r {{ result_path }}/* {{ local_result_path }}"

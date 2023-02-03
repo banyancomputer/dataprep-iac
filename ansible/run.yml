@@ -1,0 +1,40 @@
+# Run our tests
+# Orchestrate and run tests on the host machine
+
+# Usage
+# ansible-playbook -i inventory/localhost run.yml
+# -e test_set_path=/home/dataprep/test_set
+# -e packed_path=/home/dataprep/packed
+# -e unpacked_path=/home/dataprep/unpacked
+# -e manifest_path=/home/dataprep/manifest
+# -e result_path=/home/dataprep/result
+
+- become: yes
+  hosts: all
+  name: Run our tests
+  tasks:
+    # Create a directory to store our manifests
+    - name: Create a directory to store our manifests
+      file:
+        path: "{{ manifest_path }}"
+        state: directory
+        mode: 0755
+      when: manifest_path is defined
+    - name: Make sure the Results directory exists
+      file:
+        path: "{{ result_path }}"
+        state: directory
+        mode: 0755
+      when: result_path is defined
+    - name: Make sure the manifest directory is empty
+      shell: "rm -rf {{ manifest_path }}/*"
+    - name: Make sure the packed directory is empty
+      shell: "rm -rf {{ packed_path }}/*"
+    - name: Make sure the unpacked directory is empty
+      shell: "rm -rf {{ unpacked_path }}/*"
+    # Run our tests
+    # TODO (amiller68): Use cargo binary to run tests directly
+    # Iterate over the directories in the test set
+    # Run run.sh on the host
+    - name: Run our tests
+      shell: "run {{ test_set_path }} {{ packed_path }} {{ unpacked_path }} {{ manifest_path }} {{ result_path }}"
