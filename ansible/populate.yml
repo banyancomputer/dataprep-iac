@@ -100,6 +100,7 @@
       when: unpacked_size_available is defined and unpacked_size_available.stdout is defined and unpacked_size_available.stdout | int < test_set_size | int
 
     # Populate the test set with our population script
+    # TODO (amiller68): point at population script that actually works
     - name: Populate the test set
       shell:
         cmd: "populate {{ test_set_path }} {{ test_set_count }} {{ test_set_size }}"

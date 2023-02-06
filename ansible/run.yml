@@ -29,7 +29,7 @@
         mode: 0755
         owner: "{{ ansible_user }}"
       when: result_path is defined
-    # TODO (amiller68): Use cargo binary to run tests directly
+    # TODO (amiller68): Point at Benchmarking script
     # Run run.sh on the host
     - name: Run our tests
       shell: "run {{ test_set_path }} {{ packed_path }} {{ unpacked_path }} {{ manifest_path }} {{ result_path }}"
