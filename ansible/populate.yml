@@ -1,5 +1,7 @@
 # Prep our environment for the test set
 # Error check and make sure we have the test set directory ready to go
+# Note - Not gauranteed to work on AWS hosts if using volumes - make sure to use ./ansible/ec2_setup.yml to
+# setup the volumes under the correct filesystems and mount points!
 # Arguments:
 # -e test_set_path=/home/dataprep/test_set # The directory where the test set exists on its device
 # -e packed_path=/home/dataprep/packed # The directory where the packed test set exists on its device
@@ -8,7 +10,6 @@
 # -e test_set_size=1 # The size of the test set in GB
 
 - become: yes
-  become_user: root
   hosts: all
   name: Prep our Test Set directory
   tasks:
@@ -37,16 +38,22 @@
       file:
         path: "{{ test_set_path }}"
         state: directory
+        owner: "{{ ansible_user }}"
+      ignore_errors: yes
       when: test_set_path_exists is not defined or not test_set_path_exists.stat.exists
     - name: Create the packed path
       file:
         path: "{{ packed_path }}"
         state: directory
+        owner: "{{ ansible_user }}"
+      ignore_errors: yes
       when: packed_path_exists is not defined or not packed_path_exists.stat.exists
     - name: Create the unpacked path
       file:
         path: "{{ unpacked_path }}"
         state: directory
+        owner: "{{ ansible_user }}"
+      ignore_errors: yes
       when: unpacked_path_exists is not defined or not unpacked_path_exists.stat.exists
 
     # Make sure all the paths are empty. Remove any files in them
@@ -60,20 +67,20 @@
       shell: "rm -rf {{ unpacked_path }}/*"
       when: unpacked_path_exists is defined and unpacked_path_exists.stat.exists
 
-    # Check if we can populate and use the test set directory
+    # Check if we can populate the various paths with the amount of data we need
     # See if the test set directory can hold test_set_size * test_set_count GB
     - name: Check if the test set directory can hold the test set
-      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/Mi/0.001/'
+      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/G//' | sed 's/Mi/0.001/'
       register: test_set_size_available
       ignore_errors: yes
       when: test_set_path is defined
     - name : Check if the test set directory can hold the test set
       fail:
-        msg: "The test set path does not have enough space to hold the test set: {{ test_set_size_available.stdout }} out of {{ test_set_size | int * test_set_count | int }}"
-      when: test_set_size_available is defined and test_set_size_available.stdout is defined and test_set_size_available.stdout | int < (test_set_size | int * test_set_count | int)
+        msg: "The test set path does not have enough space to hold the test set: {{ test_set_size_available.stdout }} out of {{ test_set_size }} x {{ test_set_count }} = {{ test_set_size | int * test_set_count | int }}"
+      when: test_set_size_available is defined and test_set_size_available.stdout is defined and test_set_size_available.stdout | int <  (test_set_size | int * test_set_count | int)
     # See if the packed directory can a single test set
     - name: Check if the packed directory can hold the packed test set
-      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/Mi/0.001/'
+      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' |  sed 's/G//' | sed 's/Mi/0.001/'
       register: packed_size_available
       ignore_errors: yes
       when: packed_path is defined
@@ -83,7 +90,7 @@
       when: packed_size_available is defined and packed_size_available.stdout is defined and packed_size_available.stdout | int < test_set_size | int
     # See if the unpacked directory can hold the unpacked test set
     - name: Check if the unpacked directory can hold the unpacked test set
-      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/Mi/0.001/'
+      shell: df -h {{ test_set_path }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/G//' | sed 's/Mi/0.001/'
       register: unpacked_size_available
       ignore_errors: yes
       when: unpacked_path is defined
@@ -94,5 +101,9 @@
 
     # Populate the test set with our population script
     - name: Populate the test set
-      shell: "populate {{ test_set_path }} {{ test_set_count }} {{ test_set_size }}"
+      shell:
+        cmd: "populate {{ test_set_path }} {{ test_set_count }} {{ test_set_size }}"
+      # Note (amiller68): This is important for running on AWS
+      environment:
+        PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
       when: test_set_path is defined

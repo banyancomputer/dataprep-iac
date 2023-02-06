@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Source .env
+# Source .env-aws
 . .env
 
 # Run the tests on the Target system
@@ -12,7 +12,9 @@
 # It should record results for the trial in $RESULTS_PATH
 
 # A helper script to make calling Ansible easier
+export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
+  -u "$TARGET_USER" \
   -e "test_set_path=$TEST_SET_PATH" \
   -e "packed_path=$PACKED_PATH" \
   -e "unpacked_path=$UNPACKED_PATH" \

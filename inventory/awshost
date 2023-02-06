@@ -1,1 +1,1 @@
-<PUBLIC_DNS> ansible_ssh_private_key_file=</path/to/your/.ssh/file_name_here>
+ec2-3-132-142-218.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=~/.ssh/dataprep-test-ec2-key-lrr27hnl.pem

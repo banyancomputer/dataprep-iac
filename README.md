@@ -6,26 +6,29 @@ Repository for testing and benchmarking Dataprep.
 - Python
 - Ansible
 - Terraform
-
-## Configuration
-
-1. move '.env-example' to '.env' 
-2. fill in the variables in '.env' with your own values - make sure you know what you are doing. See the comments in the file for more information.
+- Git
+- Rust (Cargo, Rustup, +nightly toolchain)
+- aws cli (configured with your credentials)
 
 ## Testing locally
-Be sure to configure your environment variables in `.env` before running the following commands.
-Make sure `ANSIBLE_INVENTORY` is set to `inventory/localhost` in `.env`.
-You may or may not need to run the following commands as `sudo` depending on your local environment.
+To run test on your local machine, do the following:
+### Configure your environment
+- move `.env-local` to `.env`
+- Configure your environment variables in `.env` before running the following commands. See `.env` for more information.
+
+### Running the test pipeline
+To run the test pipeline, run the following commands:
 ```bash
-# Install Test Dependencies on local machine 
+# You might have to run this as sudo!
+# Install Test Dependencies on local machine at the configured path
 ./install.sh
 ```
 ```bash
-# Populate the test set with data
+# Populate the test set with data at the configured path
 ./populate.sh
 ```
 ```bash
-# Run the tests
+# Run the tests and store the results and manifests at the configured paths
 ./run.sh
 ```
 You should see the results of tests in the $RESULTS_PATH directory.
@@ -33,33 +36,40 @@ You can copy them to this directory with
 ```bash
 ./result.sh
 ```
-All test results run on this host should appear in your working directory in a folder called `result`.
-Note, this will overwrite any previous results on your machine. Use care when running this command.
+All test results run on this host should appear in your working directory in a folder called `local-result`.
 Files are named according to <test_parameters>-<test_timestamp>.txt
+
+You should be able to run `./populate.sh` to repopulate the test set with data.
+You should be able to run `./run.sh` to run the tests again on the same data.
+You should be able to run `./result.sh` to copy the results to your local machine. This "shouldn't" overwrite any existing results, but it might.
 
 ## Provisioning and testing on AWS
 To run test on AWS, do the following:
-
+### Configure your environment
+- move `.env-aws` to `.env`
+- That should be it!
+### Provisioning AWS infrastructure
 Import your AWS credentials into your environment. Then:
 ```
 cd terraform
 terraform init
 terraform apply
-terraform output -json > ../aws_inventory.json
 ```
-Look in `aws_inventory.json` for the IP address of the instance and the path of the .pem on your local machine.
-Edit the contents of `inventory/awshost` to match the DNS name of the instance and the path to the .pem file.
+Terraform should populate a `.env-ssh` file to facilitate SSH access to the instance.
+Terraform should populate `inventory/awshost` with the inventory of the instance.
 
-Configure your environment variables in `.env` before running the following commands.
-Make sure `ANSIBLE_INVENTORY` is set to `inventory/awshost` in `.env`.
-
-To provision test instances on AWS, run the following (you may or may not need to run as sudo)
+Finally, mount the volumes on the instance and install any dependencies:
 ```bash
-# Set up the volumes on our Cloud instance
+# Set up the volumes on our Cloud instance and install git, rust, etc.
 ./ec2_setup.sh
 ```
+
+Note, the instance configured right now with a t3.medium instance. This is a good instance for testing, but it's not a good instance for benchmarking. If you want to benchmark, you should use a larger instance.
+See `terraform/main.tf` for more information.
+
+### Running the test pipeline
 ```bash
-# Install Test Dependencies on Cloud instance
+# Install Test Dependencies on Cloud instance (dataprep + aux scripts)
 ./install.sh
 ```
 ```bash
@@ -74,6 +84,16 @@ You should see the results of tests in the $RESULTS_PATH directory. You can copy
 ```bash
 ./result.sh
 ```
-All test results run on this host should appear in your working directory in a folder called `result`.
-Note, this will overwrite any previous results on your machine. Use care when running this command.
+All test results run on this host should appear in your working directory in a folder called `local-result`.
 Files are named according to <test_parameters>-<test_timestamp>.txt
+
+You should be able to run `./populate.sh` to repopulate the test set with data.
+You should be able to run `./run.sh` to run the tests again on the same data.
+You should be able to run `./result.sh` to copy the results to your local machine. This "shouldn't" overwrite any existing results, but it might.
+
+### Destroying AWS infrastructure
+```
+cd terraform
+terraform destroy
+```
+done! :tada: 

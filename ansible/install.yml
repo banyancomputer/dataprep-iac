@@ -5,15 +5,13 @@
 
 - hosts: all
   become: yes
-#  become_method: sudo
-#  become_user: root
   tasks:
-    # Setup a Dataprep user on the host
-    - name: Create a dataprep user
-      user:
-        name: dataprep
-        shell: /bin/bash
-        state: present
+    # Create and own the install directory
+    - name: Create the install directory
+      file:
+        path: "{{ install_path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
 
     # Install the Dataprep binaries
     - name: Clone the dataprep repo
@@ -21,25 +19,16 @@
         repo: https://github.com/banyancomputer/dataprep.git
         dest: "{{ install_path }}/dataprep"
         update: yes
-#    - name: Clone the dataprep-shared repo
-#      git:
-#        repo: git@github.com:banayancomputer/dataprep-shared.git
-#        dest: /home/dataprep-shared
-#        update: yes
     - name: Build production
-      shell: cargo +nightly build --release --manifest-path Cargo.toml
+      shell: export PATH="$HOME/.cargo/bin:$PATH"; cargo +nightly build --release --manifest-path Cargo.toml
       args:
         chdir: "{{ install_path }}/dataprep"
     - name: Install the dataprep package
-      shell: cargo +nightly install  --path ./dataprep --root /usr/local
+      shell: export PATH="$HOME/.cargo/bin:$PATH"; cargo +nightly install  --path ./dataprep --root /usr/local
       args:
         chdir: "{{ install_path }}/dataprep"
-#    - name: Install the dataprep-shared package
-#      shell: cargo install --path .
-#      args:
-#          chdir: /home/dataprep-shared
 
-    # Make our scripts executable on the host
+    # Copy and modify Auxiliary scripts to the host
     # Copy our population script to the host
     - name: Copy the population script to the host
       copy:
@@ -63,11 +52,12 @@
       copy:
         src: run.sh
         dest: "{{ install_path }}/run.sh"
-    # Make the run script executable
+    # Make the run script executable by the user
     - name: Make the run script executable
       file:
         path: "{{ install_path }}/run.sh"
         mode: 0755
+        owner: "{{ ansible_user }}"
     # Delete the link if it already exists
     - name: Delete the link if it already exists
       file:

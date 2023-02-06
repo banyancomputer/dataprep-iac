@@ -8,7 +8,10 @@
 
 - become: yes
   hosts: all
-  name: Run our tests
+  name: Clone our test results
   tasks:
-    - name: Clone Results to the current working directory
-      shell: "cp -r {{ result_path }}/* {{ local_result_path }}"
+    - name: Sync the results directory on the host to the local directory
+      synchronize:
+        src: "{{ result_path }}"
+        dest: "{{ local_result_path }}"
+#      when: result_path is defined and local_result_path is defined

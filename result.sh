@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 # Source .env
+. .env-ssh
 . .env
 
-# Copy all the results from the Target system to the local system
 
-# Make sure the "results" directory exists in the current directory
-mkdir -p ./result
+mkdir -p local_result
 
-# A helper script to make calling Ansible easier
-ansible-playbook -i "$ANSIBLE_INVENTORY" \
-  -e "result_path=$RESULT_PATH" \
-  -e "local_result_path=../result" \
-  ./ansible/result.yml
+# If the test was run with the local Ansible inventory, we need to copy the results
+if [ "$ANSIBLE_INVENTORY" = "inventory/awshost" ]; then
+  scp -r -i $EC2_PEM_PATH $TARGET_USER@$EC2_PUBLIC_DNS:$RESULT_PATH/* local_result
+else
+  cp -r $RESULT_PATH/* local_result
+fi

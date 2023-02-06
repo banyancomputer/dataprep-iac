@@ -11,50 +11,111 @@
 # -e unpacked_device=/dev/sdd # The device to use for the unpacked test set
 # -e unpacked_path=/home/unpacked # The directory where the unpacked test set exists on its device
 
+# Run as root
 - become: yes
   hosts: all
-  user: root
   name: Get our Ec2 instance ready for testing
   tasks:
-    # Install the dependencies
+    # Install the dependencies - Doesn't check if they are already installed
     - name: Update Yum
       yum:
         name: "*"
         state: latest
+    - name: Install gcc
+      yum:
+        name: gcc
+        state: present
     - name: Install git
       yum:
         name: git
         state: present
-    - name: Install rust
-      yum:
-        name: rustc
-        state: present
+    - name: Download Rustup Installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/sh.rustup.rs
+        mode: '0755'
+        force: 'yes'
+      tags:
+          - rust
+    - name: install rust/cargo
+      shell: sudo /tmp/sh.rustup.rs -y
+      tags:
+        - rust
     - name: Install the nightly version of rust
-      shell: rustup toolchain install nightly
-    - name: Check for mounted test set device
-      shell: mount | grep {{ test_set_device }}
-      register: test_set_device_mounted
+      shell: export PATH="$HOME/.cargo/bin:$PATH"; rustup toolchain install nightly
+
+    # Create and Mount Filesystems on the devices - Doesn't check if they are already created, instead just tries to create them
+    # Create and mount Filesystem for the test set
+    - name: Create a Filesystem on the test set device
+      filesystem:
+        dev: "{{ test_set_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
       ignore_errors: yes
-      when: test_set_device is defined
-    # Setup devices for holding data
     - name: Mount the test set device
       mount:
         path: "{{ test_set_path }}"
         src: "{{ test_set_device }}"
         fstype: ext4
         state: mounted
-      when: test_set_device_mounted is not defined
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+    # Create and mount Filesystem for the packed test set
+    - name: Create a Filesystem on the packed device
+      filesystem:
+        dev: "{{ packed_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
+      ignore_errors: yes
     - name: Mount the packed device
       mount:
         path: "{{ packed_path }}"
         src: "{{ packed_device }}"
         fstype: ext4
         state: mounted
-      when: packed_device_mounted is not defined
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+    # Create and mount Filesystem for the unpacked test set
+    - name: Create a Filesystem on the unpacked device
+      filesystem:
+        dev: "{{ unpacked_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
+      ignore_errors: yes
     - name: Mount the unpacked device
       mount:
         path: "{{ unpacked_path }}"
         src: "{{ unpacked_device }}"
         fstype: ext4
         state: mounted
-      when: unpacked_device_mounted is not defined
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+
+    # Setup R/W permissions for the volumes
+    # Make the current user the owner of the test set directory
+    - name: Make the current user the owner of the test set directory
+      file:
+        path: "{{ test_set_path }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        recurse: yes
+    # Make the current user the owner of the packed directory
+    - name: Make the current user the owner of the packed directory
+      file:
+        path: "{{ packed_path }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        recurse: yes
+    # Make the current user the owner of the unpacked directory
+    - name: Make the current user the owner of the unpacked directory
+      file:
+        path: "{{ unpacked_path }}"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        recurse: yes
