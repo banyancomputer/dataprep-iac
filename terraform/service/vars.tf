@@ -41,20 +41,22 @@ variable "ebs_config" {
   # Set config values as strings and convert to the appropriate type.
   default     = {
     type                 = "st1" # Throughput optimized HDD volume type
-    test_set_device_name = "/dev/sdf" # The device to mount the EBS volume on the EC2 instance
+    input_device_name = "/dev/sdf" # The device to mount the EBS volume on the EC2 instance
     packed_device_name   = "/dev/sdg" # The device to mount the EBS volume on the EC2 instance
     unpacked_device_name = "/dev/sdh" # The device to mount the EBS volume on the EC2 instance
   }
 }
 
 /* Test Set Configuration */
-variable "test_set_config" {
+variable "input_config" {
   description = "Service Configuration for Test Set"
   type        = map(any)
   # Set config values as strings and convert to the appropriate type.
   default     = {
-    count = "1" # How many test sets to create
-    size  = "1" # in GB. How big each test set should be
+    // Size of a single input in GB
+    size = 1
+    // Size of all inputs in GB
+    total_size = 1
   }
 }
 

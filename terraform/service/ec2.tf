@@ -109,23 +109,6 @@ resource "aws_iam_instance_profile" "ec2" {
     name      = join("-", [var.name, "ec2-profile"])
   }
 }
-## Policy for the Ec2 instance, attached to the IAM role
-#resource "aws_iam_role_policy" "ec2" {
-#  name   = join("-", [var.name, "ec2-policy", var.deploy_id])
-#  role   = aws_iam_role.ec2.id
-#  policy = jsonencode({
-#    Version : "2012-10-17",
-#    Statement : [
-#      {
-#        Effect : "Allow",
-#        Action : [
-#
-#        ],
-#        Resource : "*"
-#      }
-#    ]
-#  })
-#}
 # Definition of the Amazon Machine Image (AMI) to use for the EC2 instance
 data "aws_ami" "ec2" {
   most_recent = true

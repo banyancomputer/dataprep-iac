@@ -7,58 +7,63 @@ Repository for testing and benchmarking Dataprep.
 - Ansible
 - Terraform
 - Git
-- Rust (Cargo, Rustup, +nightly toolchain)
 - aws cli (configured with your credentials)
 
 ## Testing locally
 To run test on your local machine, do the following:
 ### Configure your environment
-- move `.env-local` to `.env`
-- Configure your environment variables in `.env` before running the following commands. See `.env` for more information.
+- move `env.local.benchmark` to `env.benchmark`
+- Configure your environment variables in `env.benchmark` before running the following commands. See that file for more information.
 
 ### Running the test pipeline
 To run the test pipeline, run the following commands:
 ```bash
-# You might have to run this as sudo!
-# Install Test Dependencies on local machine at the configured path
+# Install Benchmark Dependencies on local machine at the configured path
 ./install.sh
 ```
 ```bash
-# Populate the test set with data at the configured path
-./populate.sh
+# Run the configured benchmarks 
+./benchmark.sh
 ```
 ```bash
-# Run the tests and store the results and manifests at the configured paths
-./run.sh
+# Check the status of a long-running benchmark
+./check.sh
 ```
-You should see the results of tests in the $RESULTS_PATH directory.
-You can copy them to this directory with
+ Results should appear at `$BENCH_PATH/dataprep/target/criterion`. You can copy them to your working directory with
 ```bash
 ./result.sh
 ```
 All test results run on this host should appear in your working directory in a folder called `local-result`.
-Files are named according to <test_parameters>-<test_timestamp>.txt
-
-You should be able to run `./populate.sh` to repopulate the test set with data.
-You should be able to run `./run.sh` to run the tests again on the same data.
-You should be able to run `./result.sh` to copy the results to your local machine. This "shouldn't" overwrite any existing results, but it might.
 
 ## Provisioning and testing on AWS
 To run test on AWS, do the following:
 ### Configure your environment
-- move `.env-aws` to `.env`
-- That should be it!
+- move `env.aws.benchmark` to `env.benchmark`
+- Configure your environment variables in `env.benchmark` before running the following commands. See that file for more information.
+- Import AWS keys into your environment with the AWS CLI 
 ### Provisioning AWS infrastructure
-Import your AWS credentials into your environment. Then:
-```
+```bash
+# Move to the terraform directory
 cd terraform
+```
+```bash
+# Source your environment variables. They have important information for terraform.
+source ../env/env.benchmark
+```
+```bash
+# Initialize terraform (if you haven't already)
 terraform init
+```
+```bash
+# Deploy the infrastructure
 terraform apply
 ```
-Terraform should populate a `.env-ssh` file to facilitate SSH access to the instance.
+
+Terraform should populate a `env/env.ssh` file to facilitate SSH access to the instance.
 Terraform should populate `inventory/awshost` with the inventory of the instance.
 
 Finally, mount the volumes on the instance and install any dependencies:
+
 ```bash
 # Set up the volumes on our Cloud instance and install git, rust, etc.
 ./ec2_setup.sh
@@ -69,27 +74,24 @@ See `terraform/main.tf` for more information.
 
 ### Running the test pipeline
 ```bash
-# Install Test Dependencies on Cloud instance (dataprep + aux scripts)
+# Install the benchmark on the remote instance 
 ./install.sh
 ```
 ```bash
-# Populate the test set with data
-./populate.sh
-```
-```bash
 # Run the tests
-./run.sh
+./benchmark.sh
 ```
-You should see the results of tests in the $RESULTS_PATH directory. You can copy them to your local machine with
 ```bash
+# Check the status of a long-running benchmark
+./check.sh
+```
+
+You should see the results of tests in the `$BENCH_PATH/dataprep/target/criterion` directory on the remote instance.
+```bash
+# You can copy them to your local machine with
 ./result.sh
 ```
 All test results run on this host should appear in your working directory in a folder called `local-result`.
-Files are named according to <test_parameters>-<test_timestamp>.txt
-
-You should be able to run `./populate.sh` to repopulate the test set with data.
-You should be able to run `./run.sh` to run the tests again on the same data.
-You should be able to run `./result.sh` to copy the results to your local machine. This "shouldn't" overwrite any existing results, but it might.
 
 ### Destroying AWS infrastructure
 ```

@@ -1,0 +1,58 @@
+# Check if our flag files exist in the bench path
+# Usage
+# -e bench_path=/home/dataprep/bench
+# -e profile_time=30
+
+
+- hosts: all
+  name: Check if our flag files exist in the bench path
+  tasks:
+    # Check if a benchmark is in progress
+    - name: Check if a benchmark is in progress
+      stat:
+        path: "{{ bench_path }}/.benchmark"
+      register: benchmark_flag
+    # If there's no benchmark in progress, exit
+    - name: If there's no benchmark in progress, exit
+      fail:
+        msg: "No benchmark in progress"
+      when: not benchmark_flag.stat.exists
+    # Check if our throughput flag file exists in the bench path
+    - name: Check if our throughput flag file exists in the bench path
+      stat:
+        path: "{{ bench_path }}/.throughput"
+      register: throughput_flag
+    # Check if our profile flag file exists in the bench path
+    - name: Check if our profile flag file exists in the bench path
+      stat:
+        path: "{{ bench_path }}/.profile"
+      register: profile_flag
+
+    # Log to the controller if we've started a throughput benchmark
+    # Note: This prolly gives inaccurate results
+    - name: Log to the controller whether we've started a throughput benchmark
+      debug:
+        msg: "Waiting to Begin Benchmark"
+      when: not throughput_flag.stat.exists and not profile_flag.stat.exists
+
+    # Log to the controller if we are running a throughput benchmark
+    - name: Log to the controller if we are running a throughput benchmark
+      debug:
+        msg: "Throughput Benchmark in Progress: {{ throughput_flag.stat.exists }}"
+      when: throughput_flag.stat.exists
+    # Otherwise, log that it's been completed
+    - name: Otherwise, log that it's been completed
+      debug:
+        msg: "Throughput Benchmark Completed"
+      when: not throughput_flag.stat.exists and profile_flag.stat.exists
+
+    # Log to the controller whether we plan on running a profile benchmark
+    - name: Log to the controller whether or not we plan on running a profile benchmark
+      debug:
+        msg: "Profile Benchmark Planned: {{ profile_time is defined and profile_time > 0 }}"
+      when: not profile_flag.stat.exists and profile_time is defined and profile_time | int > 0
+    # Log to the controller if we are running a profile benchmark
+    - name: Log to the controller if we are running a profile benchmark
+      debug:
+        msg: "Profile Benchmark in Progress: {{ profile_flag.stat.exists }}"
+      when: profile_flag.stat.exists
