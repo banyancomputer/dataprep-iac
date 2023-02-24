@@ -83,9 +83,10 @@ Finally, mount the volumes on the instance and install any dependencies:
 ./ec2_setup.sh
 ```
 
-Note, the instance configured right now with a r6g.8xlarge dedicated instance. 
+Note, the instance configured right now with a r6g.8xlarge ~~dedicated~~ instance. 
 You might need to contact your AWS administrator to get access to this instance type.
-See `terraform/main.tf` for more information or to configure a different instance type.
+See `terraform/main.tf` for more information or to configure a different instance type, and 
+`terraform/service/ec2.tf` to turn on or off dedicated instances.
 
 ### Running the test pipeline
 ```bash

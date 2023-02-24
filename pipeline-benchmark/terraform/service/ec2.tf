@@ -140,9 +140,9 @@ resource "aws_instance" "ec2" {
     volume_type = var.ec2_config.volume_type
   }
   ebs_optimized          = true
-#  tenancy                = "dedicated"
+  # TODO (amiller68) - Resolve our dedicated instance woes with AWS
+  #  tenancy                = "dedicated"
   # Link our Dependencies
-#  host_id                = aws_ec2_host.ec2.id
   ami                    = data.aws_ami.ec2.id
   key_name               = aws_key_pair.ec2.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2.name
