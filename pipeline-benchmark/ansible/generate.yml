@@ -1,0 +1,80 @@
+# Generate input for the benchmark using the fake-file tool
+# -e input_path=/home/dataprep/input
+# -e file_structures=simple,skinny,...
+# -e file_structures_size=1024
+# -e file_structures_max_width=2
+# -e file_structures_max_depth=2
+
+- hosts: all
+  name: Generate input for the benchmark using the fake-file tool
+  tasks:
+    # Create the input directory if it doesn't exist
+    - name: Create the input directory if it doesn't exist
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    # Get the current time on the host
+    - name: Get the current time on the host
+      shell: date +%s
+      register: start_time
+    # Log this time to the control host
+    - name: Log this time on the controller
+      debug:
+        msg: "Generating Input: {{ start_time.stdout }}"
+    - name: Log the generation parameters to the controller
+      debug:
+        msg: "input_path: {{ input_path }}
+              file_structures: {{ file_structures }}
+              file_structures_size: {{ file_structures_size }}
+              file_structures_max_width: {{ file_structures_max_width }}
+              file_structures_max_depth: {{ file_structures_max_depth }}"
+
+#    # Iterate through the file_structures -- it's a comma separated list
+#    - name: Iterate through the file_structures
+#      set_fact:
+#        file_structures:
+    # For each file structure, generate input -- case switch on the file structure
+    - name: Generate our input
+      shell: "
+        fake-file \
+         -s {{ file_structures_size }} \
+         -w {{ file_structures_max_width }} \
+         -d {{ file_structures_max_depth }} \
+         --strategy {{ item }} \
+         -o {{ input_path }}
+         -v
+       "
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+      register: fake_file_call
+      with_items: "{{ file_structures.split(',') }}"
+    - name: Log the fake-file call to the controller
+      debug:
+        msg: "{{ fake_file_call.results[0].stdout_lines }}"
+
+    # Get the current time on the host
+    - name: Get the current time on the host
+      shell: date +%s
+      register: start_time
+    # Log this time to the control host
+    - name: Log this time on the controller
+      debug:
+        msg: "Generating Input Complete: {{ start_time.stdout }}"
+
+    # If we have an IFTTT webhook key, send a notification to IFTTT that we're done'
+    - name: If we have an IFTTT webhook key, send a notification to IFTTT that we're done
+      uri:
+        url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
+        method: POST
+        body: "{
+          \"Title\": \"Input Generated\",
+          \"Time\": \"{{ start_time.stdout }}\",
+          \"FileStructures\": \"{{ file_structures }}\",
+          \"FileStructuresSize\": \"{{ file_structures_size }}\",
+          \"FileStructuresMaxWidth\": \"{{ file_structures_max_width }}\",
+          \"FileStructuresMaxDepth\": \"{{ file_structures_max_depth }}\",
+        }"
+        body_format: json
+        status_code: 200
+      register: ifttt_response
+      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""

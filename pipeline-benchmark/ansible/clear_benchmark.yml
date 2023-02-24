@@ -1,0 +1,44 @@
+# Check if our flag files exist in the bench path
+# Usage
+# -e bench_path=/home/dataprep/bench
+
+
+
+- hosts: all
+  name: Check if our flag files exist in the bench path
+  tasks:
+    # Check if a benchmark is in progress
+    - name: Check if a benchmark is in progress
+      stat:
+        path: "{{ bench_path }}/.benchmark"
+      register: benchmark_flag
+    # If there's no benchmark in progress, exit
+    - name: If there's no benchmark in progress, exit
+      fail:
+        msg: "No benchmark in progress"
+      when: not benchmark_flag.stat.exists
+    - name: If there is a benchmark in progress, remove the flag file anyway
+      file:
+        path: "{{ bench_path }}/.benchmark"
+        state: absent
+      when: benchmark_flag.stat.exists
+
+    # Make the packed, unpacked, result, and manifest directories empty
+    - name: Make the packed, unpacked, result, and manifest directories empty
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ packed_path }}"
+        - "{{ unpacked_path }}"
+        - "{{ result_path }}"
+        - "{{ manifest_path }}"
+    - name: Make the packed, unpacked, result, and manifest directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ packed_path }}"
+        - "{{ unpacked_path }}"
+        - "{{ result_path }}"
+        - "{{ manifest_path }}"

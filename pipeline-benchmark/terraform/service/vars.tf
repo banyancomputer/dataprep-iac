@@ -26,6 +26,7 @@ variable "ec2_config" {
   # Set config values as strings and convert to the appropriate type.
   default     = {
     instance_type = "t3.micro" # The instance type to use for the EC2 instance
+    ami_filter    = "amzn2-ami-hvm-*-arm64-gp2"
     monitoring    = "false" # Whether to enable detailed monitoring
     volume_type   = "gp2" # The type of volume to use for the EC2 instance
     volume_size   = "20" # in GB. How big of a volume to mount on the Ec2. This is the Size needed for the AMI
@@ -41,7 +42,7 @@ variable "ebs_config" {
   # Set config values as strings and convert to the appropriate type.
   default     = {
     type                 = "st1" # Throughput optimized HDD volume type
-    input_device_name = "/dev/sdf" # The device to mount the EBS volume on the EC2 instance
+    input_device_name    = "/dev/sdf" # The device to mount the EBS volume on the EC2 instance
     packed_device_name   = "/dev/sdg" # The device to mount the EBS volume on the EC2 instance
     unpacked_device_name = "/dev/sdh" # The device to mount the EBS volume on the EC2 instance
   }
@@ -54,7 +55,7 @@ variable "input_config" {
   # Set config values as strings and convert to the appropriate type.
   default     = {
     // Size of a single input in GB
-    size = 1
+    size       = 1
     // Size of all inputs in GB
     total_size = 1
   }

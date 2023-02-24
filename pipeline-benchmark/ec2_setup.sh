@@ -8,8 +8,10 @@
 
 # A helper script to make calling Ansible easier
 export ANSIBLE_HOST_KEY_CHECKING=False
+export ANSIBLE_CALLBACKS_ENABLED=profile_tasks
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$TARGET_USER" \
+  -e "bench_path=$BENCH_PATH" \
   -e "input_mount=$INPUT_MOUNT" \
   -e "packed_mount=$PACKED_MOUNT" \
   -e "unpacked_mount=$UNPACKED_MOUNT" \

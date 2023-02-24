@@ -9,6 +9,5 @@
 export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$TARGET_USER" \
-  -e "bench_path=$BENCH_PATH" \
-  -e "profile_time=$PROFILE_TIME" \
-  ./ansible/check.yml
+  -e "input_path=$INPUT_PATH" \
+  ./ansible/clear_generate.yml

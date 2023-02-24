@@ -116,9 +116,20 @@ data "aws_ami" "ec2" {
   filter {
     name   = "name"
     # We want something with hardware virtualization support, on x86_64, using gp2 storage
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = [var.ec2_config.ami_filter]
   }
 }
+# Create a dedicated host for the EC2 instance
+#resource "aws_ec2_host" "ec2" {
+#  availability_zone = var.aws_availability_zone
+#  instance_type     = var.ec2_config.instance_type
+#  tags              = {
+#    deploy_id = var.deploy_id
+#    service   = var.name
+#    name      = join("-", [var.name, "ec2-host"])
+#  }
+#}
+
 # (Finally) The EC2 Instance itself
 resource "aws_instance" "ec2" {
   # Configure the instance
@@ -128,7 +139,10 @@ resource "aws_instance" "ec2" {
     volume_size = tonumber(var.ec2_config.volume_size)
     volume_type = var.ec2_config.volume_type
   }
+  ebs_optimized          = true
+#  tenancy                = "dedicated"
   # Link our Dependencies
+#  host_id                = aws_ec2_host.ec2.id
   ami                    = data.aws_ami.ec2.id
   key_name               = aws_key_pair.ec2.key_name
   iam_instance_profile   = aws_iam_instance_profile.ec2.name

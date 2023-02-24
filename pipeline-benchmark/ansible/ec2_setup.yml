@@ -3,7 +3,7 @@
 # - git
 # - rust
 # - rust nightly
-# - cargo-criterion
+# - cargo-flamegraph
 # - linux-perf
 # We should check that the host has the following devices mounted:
 # - <input_device> # The device to use for benchmark input
@@ -27,60 +27,61 @@
 # -e input_size_gb=100 # The size of the test set in GB
 # -e total_input_size_gb=1000 # The total size of the test set in GB
 
-# Run as root
-- become: yes
-  hosts: all
+- hosts: all
   name: Get our Ec2 instance ready for testing
   tasks:
     # Install the dependencies - Doesn't check if they are already installed
     # Update Yum
     - name: Update Yum
+      become: yes
       yum:
         name: "*"
         state: latest
     # Install Dependencies
     - name: Install Dependencies
+      become: yes
       yum:
         name: "{{ item }}"
         state: present
       with_items:
         - gcc
-#        - perl
-#        - pcre-devel
-#        - zlib-devel
         - git
         - perf
         - openssl-devel
-    # Install git
-    - name: Install git
-      yum:
-        name: git
-        state: present
+        - git
+    #        - linux-tools-common
+    #        - linux-tools-generic
+    # Download and install Rustup
     - name: Download Rustup Installer
       get_url:
         url: https://sh.rustup.rs
-        dest: /tmp/sh.rustup.rs
+        dest: /home/ec2-user/rustup.rs
         mode: '0755'
         force: 'yes'
       tags:
-          - rust
+        - rust
     - name: install rust/cargo
-      shell: sudo /tmp/sh.rustup.rs -y
+      shell: /home/ec2-user/rustup.rs -y
       tags:
         - rust
     - name: Install the nightly version of rust
       shell: rustup toolchain install nightly
       environment:
         PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
-    # Install cargo-criterion (for benchmarking throughput)
-    - name: Install Cargo Criterion
-      shell: cargo +nightly install cargo-criterion
-      environment:
-        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Make the user the owner of the benchmarking directory
+    - name: Make the current user the owner of the benchmarking directory
+      become: yes
+      file:
+        path: "{{ bench_path }}"
+        owner: "{{ ansible_user }}"
+        group: "ec2-user"
+        recurse: yes
 
     # Create and Mount Filesystems on the devices - Doesn't check if they are already created, instead just tries to create them
     # Create and mount Filesystem for the test set
     - name: Create a Filesystem on the test set device
+      become: yes
       filesystem:
         dev: "{{ input_device }}"
         fstype: ext4
@@ -89,6 +90,7 @@
       # if the above fails, continue as if it succeeded - probably because the filesystem already exists
       ignore_errors: yes
     - name: Mount the test set device
+      become: yes
       mount:
         path: "{{ input_mount }}"
         src: "{{ input_device }}"
@@ -98,6 +100,7 @@
       ignore_errors: yes
     # Create and mount Filesystem for the packed test set
     - name: Create a Filesystem on the packed device
+      become: yes
       filesystem:
         dev: "{{ packed_device }}"
         fstype: ext4
@@ -106,6 +109,7 @@
       # if the above fails, continue as if it succeeded - probably because the filesystem already exists
       ignore_errors: yes
     - name: Mount the packed device
+      become: yes
       mount:
         path: "{{ packed_mount }}"
         src: "{{ packed_device }}"
@@ -115,6 +119,7 @@
       ignore_errors: yes
     # Create and mount Filesystem for the unpacked test set
     - name: Create a Filesystem on the unpacked device
+      become: yes
       filesystem:
         dev: "{{ unpacked_device }}"
         fstype: ext4
@@ -123,6 +128,7 @@
       # if the above fails, continue as if it succeeded - probably because the filesystem already exists
       ignore_errors: yes
     - name: Mount the unpacked device
+      become: yes
       mount:
         path: "{{ unpacked_mount }}"
         src: "{{ unpacked_device }}"
@@ -134,22 +140,25 @@
     # Setup R/W permissions for the volumes
     # Make the current user the owner of the test set directory
     - name: Make the current user the owner of the test set directory
+      become: yes
       file:
         path: "{{ input_mount }}"
         owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
+        group: "ec2-user"
         recurse: yes
     # Make the current user the owner of the packed directory
     - name: Make the current user the owner of the packed directory
+      become: yes
       file:
         path: "{{ packed_mount }}"
-        owner: "{{ ansible_user }}"
+        owner: "ec2-user"
         recurse: yes
     # Make the current user the owner of the unpacked directory
     - name: Make the current user the owner of the unpacked directory
+      become: yes
       file:
         path: "{{ unpacked_mount }}"
-        owner: "{{ ansible_user }}"
+        owner: "ec2-user"
         recurse: yes
 
     # Double check if we have enough space to run a benchmark
