@@ -1,0 +1,144 @@
+# Run our throughput benchmark on the Dataprep Pipeline
+# Relies on
+# - dataprep
+# - fake-file
+# - flamegraph
+
+# Usage
+# ansible-playbook -i inventory/localhost
+# -e bench_path=/home/dataprep/bench
+# -e input_path=/home/dataprep/input
+# -e packed_path=/home/dataprep/packed
+# -e unpacked_path=/home/dataprep/unpacked
+# -e manifest_path=/home/dataprep/manifest
+# -e result_path=/home/dataprep/result
+# -e ifttt_test_webhook_key=YOUR_KEY
+# ./benchmark.yml
+
+# TODO (amiller68): Change file flags to facts
+
+- hosts: all
+  name: Run our benchmarks
+  tasks:
+    # Error Check ahead of time
+    # Check if the benchmark is already running
+    - name: Check if the benchmark is already running
+      stat:
+        path: "{{ bench_path }}/.benchmark"
+      register: benchmark_running
+    # If the benchmark is already running, exit
+    - name: If the benchmark is already running, exit
+      fail:
+        msg: "Benchmark is already running"
+      when: benchmark_running.stat.exists
+    # Make sure the input path exists and has data in it
+    - name: Make sure the input path exists
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Register the contents of the input path
+      shell: ls -1 {{ input_path }}
+      register: input_path_contents
+    - fail:
+        msg: "No files found in {{ input_path }}"
+      when: input_path_contents.stdout == ""
+    # Success! Flag that a benchmark is now running
+    - name: Flag that a benchmark is running
+      file:
+        path: "{{ bench_path }}/.benchmark"
+        state: touch
+
+    # Get the current time on the host
+    - name: Get the current time on the host
+      shell: date +%s
+      register: start_time
+    # Log this time to the control host
+    - name: Log this time on the controller
+      debug:
+        msg: "Throughput Benchmark Start Time: {{ start_time.stdout }}"
+
+    # Prep the auxiliary paths
+    # Make sure the packed path exists
+    - name: Make sure the packed path exists
+      file:
+        path: "{{ packed_path }}"
+        state: directory
+    # Make sure the unpacked path exists
+    - name: Make sure the unpacked path exists
+      file:
+        path: "{{ unpacked_path }}"
+        state: directory
+    # Make sure the manifest path exists
+    - name: Make sure the manifest path exists
+      file:
+        path: "{{ manifest_path }}"
+        state: directory
+    # Make sure the result path exists
+    - name: Make sure the result path exists
+      file:
+        path: "{{ result_path }}"
+        state: directory
+    # Make sure a place for results exists in the result path
+    - name: Make sure a directory exists in the result path for this run
+      file:
+        path: "{{ result_path }}/{{ start_time.stdout }}"
+        state: directory
+
+
+    # Run the benchmark over the Input space
+    # Send a notification to IFTTT that Benchmarking has started
+    - name: Send a notification to IFTTT that Benchmarking has started
+      uri:
+        url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+        body: "{
+          \"Title\": \"Benchmarking Started\",
+          \"Time\": \"{{ start_time.stdout }}\",
+        }"
+        body_format: json
+        status_code: 200
+      register: ifttt_notification
+      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+    # Get the name of every file and directory in the input path
+    - name: Determine the inputs to test
+      find:
+        paths: "{{ input_path }}"
+        file_type: any
+      register: input_files
+    - name: Log to the control host what inputs we are testing
+      debug:
+        msg: "Testing inputs: {{ input_files.files | map(attribute='path') | list }}"
+    # Loop our pipeline tasks over the input files
+    - ansible.builtin.include_tasks: pipeline.yml
+      loop: "{{ input_files.files }}"
+      loop_control:
+        loop_var: input_file
+      when: input_files.files | length > 0
+
+    # CLEANUP
+    # Send a notification to IFTTT that the benchmarking has completed
+    - name: Note the current time
+      shell: date +%s
+      register: current_time
+    - name: Send a notification to IFTTT that the benchmarking has completed
+      uri:
+        url: "https://maker.ifttt.com/trigger/benchmark-done/json/with/key/{{ ifttt_test_webhook_key }}"
+        method: POST
+        headers:
+          Content-Type: "application/json"
+        body: "{
+          \"Title\": \"Benchmarking Completed\",
+          \"Time\": \"{{ current_time.stdout }}\",
+          \"Throughput_Error\": \"{{ run_throughput is defined and run_throughput.rc != 0 }}\", 
+        }"
+        body_format: json
+        status_code: 200
+      register: ifttt_notification
+      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+      # Remove our Bench Flag
+    - name: Remove our Bench Flag
+      file:
+        path: "{{ bench_path }}/.benchmark"
+        state: absent

@@ -1,0 +1,165 @@
+# Set up the e2e benchmark
+# Set the input path using the input_file variable
+# Get file or directory name from the input_file variable
+- name: Get the input file or directory name
+  shell: basename {{ input_file.path }}
+  register: input_file_name
+
+# Get the size of the input
+- name: Get the size of the input file in KB
+  command: "du -sk {{ input_path }}/{{ input_file_name.stdout }}"
+  register: input_size_raw
+- name: Get the size of the input file
+  set_fact:
+    input_size: "{{ input_size_raw.stdout.split('\t')[0] }}"
+
+- name: Log to the control host that we are running the benchmark on the input file
+  debug:
+    msg: "Running benchmark on {{ input_file_name.stdout }} ({{ input_size }} kilobytes)"
+- name: Log where we store the results
+  debug:
+    msg: "Storing results in {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}"
+
+# Determine if this system supports time --verbose
+- name: Determine if this system supports time --verbose
+  shell: time --verbose true
+  register: time_verbose
+  ignore_errors: yes
+- name: Set a fact to indicate if time --verbose is supported
+  set_fact:
+    time_verbose_flag: "--verbose"
+  when: time_verbose is defined and time_verbose.rc is defined and time_verbose.rc == 0
+- name: Set a fact to indicate if time --verbose is not supported
+  set_fact:
+    time_verbose_flag: ""
+  when: time_verbose is defined and time_verbose.rc is defined and time_verbose.rc != 0
+
+# Set up the result path
+- name: Make sure a directory exists in the result path for storing pack results
+  file:
+    path: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack"
+    state: directory
+- name: Benchmark packing the input path and record the result for {{ input_file_name.stdout }}
+  shell: "
+  time {{ time_verbose_flag }}  \
+    dataprep \ 
+      pack \
+        -i {{ input_path }}/{{ input_file_name.stdout }} \
+        -o {{ packed_path }} \
+        -m {{ manifest_path }}/{{ input_file_name.stdout }}.json; 
+  "
+  register: pack_result
+- name: Log the result to the result path
+  shell: "
+    echo 'STD_OUT:\n{{ pack_result.stdout }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/result.log;
+    echo 'STD_ERR:\n{{ pack_result.stderr }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/result.log;
+  "
+- name: Log the size of the input file to the result path
+  copy:
+    content: "Input Size: {{ input_size }} Kb"
+    dest: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/input_size.log"
+- name: Send a IFTTT notification that the pack benchmark has finished
+  uri:
+    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
+    method: POST
+    body: "{
+          \"Title\": \"Pack Benchmark Finished\",
+          \"Input File\": \"{{ input_file_name.stdout }}\",
+          \"Input File Size\": \"{{ input_size }} Kb\",
+        }"
+    body_format: json
+    status_code: 200
+  register: ifttt_notification
+  when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+# Unpack the input file
+- name: Get the size of the packed path
+  command: "du -sk {{ packed_path }}"
+  register: packed_size_raw
+- name: Get the size of the packed file
+  set_fact:
+    packed_size: "{{ packed_size_raw.stdout.split('\t')[0] }}"
+- name: Make sure a directory exists in the result path for storing unpack results
+  file:
+    path: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack"
+    state: directory
+- name: Benchmark unpacking the input path and record the result for {{ input_file_name.stdout }}
+  shell: "
+  time {{ time_verbose_flag }} \
+    dataprep \ 
+      unpack \
+        -i {{ packed_path }} \
+        -o {{ unpacked_path }} \ 
+        -m {{ manifest_path }}/{{ input_file_name.stdout }}.json;
+  "
+  register: unpack_result
+- name: Log the result to the result path
+  shell: "
+    echo 'STD_OUT:\n{{ unpack_result.stdout }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/result.log;
+    echo 'STD_ERR:\n{{ unpack_result.stderr }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/result.log;
+  "
+- name: Log the size of the input file to the result path
+  copy:
+    content: "Input Size: {{ input_size }} Kb"
+    dest: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/input_size.log"
+- name: Log the size of the packed file to the result path
+  copy:
+    content: "Packed Size: {{ packed_size }} Kb"
+    dest: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/packed_size.log"
+- name: Send a IFTTT notification that the unpack benchmark has finished
+  uri:
+    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
+    method: POST
+    body: "{
+          \"Title\": \"Unpack Benchmark Finished\",
+          \"Input File\": \"{{ input_path }}\",
+          \"Input File Size\": \"{{ input_size }} Kb\",
+          \"Packed File Size\": \"{{ packed_size }} Kb\",
+    }"
+    body_format: json
+    status_code: 200
+  register: ifttt_notification
+  when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+
+# Cleanup
+# Clean up the manifest, packed and unpacked files
+- name: Remove the files in the packed path
+  file:
+    path: "{{ packed_path }}"
+    state: absent
+- name: Remove the files in the unpacked path
+  file:
+    path: "{{ unpacked_path }}"
+    state: absent
+- name: Remove the files in the manifest path
+  file:
+    path: "{{ manifest_path }}"
+    state: absent
+- name: Make sure the packed path is an empty directory
+  file:
+    path: "{{ packed_path }}"
+    state: directory
+- name: Make sure the unpacked path is an empty directory
+  file:
+    path: "{{ unpacked_path }}"
+    state: directory
+- name: Make sure the manifest path is an empty directory
+  file:
+    path: "{{ manifest_path }}"
+    state: directory
+
+# Let us know when we are done
+- name: Send a IFTTT notification that the benchmark cleanup has finished
+  uri:
+    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
+    method: POST
+    body: "{
+          \"Title\": \"Cleanup Finished\",
+          \"Input File\": \"{{ input_path }}\",
+          \"Input Size\": \"{{ input_size }} Kb\",
+          \"Packed Size\": \"{{ packed_size}} Kb \",
+        }"
+    body_format: json
+    status_code: 200
+  register: ifttt_notification
+  when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+

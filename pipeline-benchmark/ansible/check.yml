@@ -1,0 +1,23 @@
+# Check if our flag files exist in the bench path
+# Usage
+# -e bench_path=/home/dataprep/bench
+# -e profile_time=30
+
+
+- hosts: all
+  name: Check if our flag files exist in the bench path
+  tasks:
+    # Check if a benchmark is in progress
+    - name: Check if a benchmark is in progress
+      stat:
+        path: "{{ bench_path }}/.benchmark"
+      register: benchmark_flag
+    # If there's no benchmark in progress, exit
+    - name: If there's no benchmark in progress, exit
+      fail:
+        msg: "No benchmark in progress"
+      when: not benchmark_flag.stat.exists
+    - name: If there is a benchmark in progress, continue
+      debug:
+        msg: "Benchmark in progress"
+      when: benchmark_flag.stat.exists
