@@ -26,6 +26,7 @@ variable "ec2_config" {
   # Set config values as strings and convert to the appropriate type.
   default     = {
     instance_type = "t3.micro" # The instance type to use for the EC2 instance
+    tenancy       = "default" # The tenancy of the instance
     ami_filter    = "amzn2-ami-hvm-*-arm64-gp2"
     monitoring    = "false" # Whether to enable detailed monitoring
     volume_type   = "gp2" # The type of volume to use for the EC2 instance

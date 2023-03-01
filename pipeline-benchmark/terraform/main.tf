@@ -71,7 +71,7 @@ variable "TOTAL_INPUT_SIZE_GB" {
 
 /* Deploy the infrastructure for our service */
 module "service" {
-  source = "service"
+  source = "./service"
 
   # AWS configuration
   aws_region            = "us-east-2"
@@ -82,8 +82,12 @@ module "service" {
   # Ec2 configuration
   # TODO: Replace with a larger instance type, something like r6g.8xlarge
   ec2_config            = {
-    #    instance_type = "t3.medium" # Minimum instance type for our service
+    # This is the instance type we want to use for actual benchmarking. Change this if you want to use a different instance type
+    # This may affect performance of long running benchmarks and tasks
     instance_type = "r6g.8xlarge"
+    # Make sure we use a dedicated instance. Your AWS account may not have enough capacity to run this instance type.
+    tenancy       = "dedicated"
+    # This is the AMI we want to use for our instance. This filter for Amazon Linux 2 AMI for ARM64.
     ami_filter    = "amzn2-ami-hvm-*-arm64-gp2"
     monitoring    = "false"
     volume_type   = "gp2"
@@ -111,7 +115,7 @@ resource "null_resource" "ansible_inventory" {
   triggers   = {
     ec2_public_dns = module.service.ec2_public_dns
     ec2_pem_path   = module.service.ec2_pem_path
-    this_once = true
+    this_once      = true
   }
   # Overwrite ../inventory/awshost with the public DNS of the EC2 instance and the path to the PEM file
   # Then write the public DNS and path to pem to ../pipeline_throughput.sh-aws-ssh to access in a shell

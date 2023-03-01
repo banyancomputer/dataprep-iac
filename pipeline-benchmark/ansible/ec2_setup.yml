@@ -3,8 +3,6 @@
 # - git
 # - rust
 # - rust nightly
-# - cargo-flamegraph
-# - linux-perf
 # We should check that the host has the following devices mounted:
 # - <input_device> # The device to use for benchmark input
 # - <packed_device> # The device to use for the packed inputs
@@ -45,12 +43,9 @@
         state: present
       with_items:
         - gcc
-        - git
         - perf
         - openssl-devel
         - git
-    #        - linux-tools-common
-    #        - linux-tools-generic
     # Download and install Rustup
     - name: Download Rustup Installer
       get_url:
@@ -64,6 +59,10 @@
       shell: /home/ec2-user/rustup.rs -y
       tags:
         - rust
+    - name: Remove Rustup Installer
+      file:
+        path: /home/ec2-user/rustup.rs
+        state: absent
     - name: Install the nightly version of rust
       shell: rustup toolchain install nightly
       environment:

@@ -148,7 +148,7 @@
     state: directory
 
 # Let us know when we are done
-- name: Send a IFTTT notification that the cleanup benchmark has finished
+- name: Send a IFTTT notification that the benchmark cleanup has finished
   uri:
     url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
     method: POST

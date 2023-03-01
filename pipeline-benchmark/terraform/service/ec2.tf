@@ -135,13 +135,13 @@ resource "aws_instance" "ec2" {
   # Configure the instance
   instance_type = var.ec2_config.instance_type
   monitoring    = tobool(var.ec2_config.monitoring)
+  tenancy       = var.ec2_config.tenancy
   root_block_device {
     volume_size = tonumber(var.ec2_config.volume_size)
     volume_type = var.ec2_config.volume_type
   }
   ebs_optimized          = true
   # TODO (amiller68) - Resolve our dedicated instance woes with AWS
-  #  tenancy                = "dedicated"
   # Link our Dependencies
   ami                    = data.aws_ami.ec2.id
   key_name               = aws_key_pair.ec2.key_name
