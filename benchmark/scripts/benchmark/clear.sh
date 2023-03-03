@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source our environment variables
-. env/env.benchmark
+. env/env.instance
 
 # Check if our Benchmarks are still running
 
@@ -14,4 +14,4 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -e "unpacked_path=$UNPACKED_PATH" \
   -e "manifest_path=$MANIFEST_PATH" \
   -e "result_path=$RESULT_PATH" \
-  ./ansible/clear_benchmark.yml
+  ./ansible/benchmark/clear.yml

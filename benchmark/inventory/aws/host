@@ -1,1 +1,0 @@
-ec2-3-139-151-224.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=~/.ssh/dataprep-benchmark-ec2-key-x68kj5rv.pem

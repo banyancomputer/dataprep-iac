@@ -45,6 +45,7 @@
         - perf
         - openssl-devel
         - git
+        - lshw
     # Download and install Rustup
     - name: Download Rustup Installer
       get_url:

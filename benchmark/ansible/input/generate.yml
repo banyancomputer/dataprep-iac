@@ -14,27 +14,16 @@
       file:
         path: "{{ input_path }}"
         state: directory
-    # Get the current time on the host
-    - name: Get the current time on the host
-      shell: date +%s
-      register: start_time
-    # Log this time to the control host
-    - name: Log this time on the controller
-      debug:
-        msg: "Generating Input: {{ start_time.stdout }}"
     - name: Log the generation parameters to the controller
       debug:
-        msg: "input_path: {{ input_path }}
+        msg: "Generating Input with parameters at {{ input_path }}:
+              input_path: {{ input_path }}
               file_structures: {{ file_structures }}
               file_structures_size: {{ file_structures_size }}
               file_structures_max_width: {{ file_structures_max_width }}
               file_structures_max_depth: {{ file_structures_max_depth }}"
 
-#    # Iterate through the file_structures -- it's a comma separated list
-#    - name: Iterate through the file_structures
-#      set_fact:
-#        file_structures:
-    # For each file structure, generate input -- case switch on the file structure
+    # Generate our input
     - name: Generate our input
       shell: "
         fake-file \
@@ -57,17 +46,11 @@
     - name: Get the current time on the host
       shell: date +%s
       register: start_time
-    # Log this time to the control host
-    - name: Log this time on the controller
-      debug:
-        msg: "Generating Input Complete: {{ start_time.stdout }}"
-
-    # If we have an IFTTT webhook key, send a notification to IFTTT that we're done'
-    - name: If we have an IFTTT webhook key, send a notification to IFTTT that we're done
-      uri:
-        url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
-        method: POST
-        body: "{
+    # Send a notification to IFTTT that we're done
+    - include_tasks: ../utils/ifttt.yml
+      vars:
+        ifttt_job: "benchmark-notification"
+        ifttt_body: "{
           \"Title\": \"Input Generated\",
           \"Time\": \"{{ start_time.stdout }}\",
           \"FileStructures\": \"{{ file_structures }}\",
@@ -75,7 +58,6 @@
           \"FileStructuresMaxWidth\": \"{{ file_structures_max_width }}\",
           \"FileStructuresMaxDepth\": \"{{ file_structures_max_depth }}\",
         }"
-        body_format: json
-        status_code: 200
-      register: ifttt_response
+        # Note: These need to be named differently than the variables in the playbook
+        ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
       when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""

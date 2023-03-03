@@ -10,7 +10,8 @@ We don't provide local setup scripts, but so long as:
 - You have the dependencies installed:
   - git
   - rust (nightly)
-  - time (for `time` command)
+  - time (for `time` command). This should be the Linux version, not the BSD version.
+  - (optional) lshw 
 You should be good to go!
 
 ### Destroying the instance 

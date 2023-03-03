@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Source our environment variables
-. env/env.benchmark
+. env/env.instance
+. env/env.git
+. env/env.ifttt
 
 # Run the Benchmark on the Target system
 # Benching script handles populating inputs and cleaning up outputs
@@ -18,8 +20,4 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -e "manifest_path=$MANIFEST_PATH" \
   -e "result_path=$RESULT_PATH" \
   -e "ifttt_test_webhook_key=$IFTTT_TEST_WEBHOOK_KEY" \
-  -e "file_structures=$FILE_STRUCTURES" \
-  -e "file_structures_size=$FILE_STRUCTURES_SIZE" \
-  -e "file_structures_max_width=$FILE_STRUCTURES_MAX_WIDTH" \
-  -e "file_structures_max_depth=$FILE_STRUCTURES_MAX_DEPTH" \
-  ./ansible/benchmark.yml
+  ./ansible/benchmark/run.yml

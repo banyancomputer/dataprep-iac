@@ -1,5 +1,6 @@
-# Set up the e2e benchmark
-# Set the input path using the input_file variable
+# Run an end-to-end pack and unpack benchmark on an Input File or Directory
+# Set the input using the input_file variable. It's a file or directory handle from ansible.
+
 # Get file or directory name from the input_file variable
 - name: Get the input file or directory name
   shell: basename {{ input_file.path }}
@@ -15,7 +16,7 @@
 
 - name: Log to the control host that we are running the benchmark on the input file
   debug:
-    msg: "Running benchmark on {{ input_file_name.stdout }} ({{ input_size }} kilobytes)"
+    msg: "Running benchmark on {{ input_file_name.stdout }} ({{ input_size }} KB)"
 - name: Log where we store the results
   debug:
     msg: "Storing results in {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}"
@@ -39,6 +40,8 @@
   file:
     path: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack"
     state: directory
+
+# Run the pack benchmark and store the results
 - name: Benchmark packing the input path and record the result for {{ input_file_name.stdout }}
   shell: "
   time {{ time_verbose_flag }}  \
@@ -58,20 +61,18 @@
   copy:
     content: "Input Size: {{ input_size }} Kb"
     dest: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/input_size.log"
-- name: Send a IFTTT notification that the pack benchmark has finished
-  uri:
-    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
-    method: POST
-    body: "{
+- include_tasks: ../utils/ifttt.yml
+  vars:
+    ifttt_job: "benchmark-notification"
+    ifttt_body: "{
           \"Title\": \"Pack Benchmark Finished\",
           \"Input File\": \"{{ input_file_name.stdout }}\",
           \"Input File Size\": \"{{ input_size }} Kb\",
         }"
-    body_format: json
-    status_code: 200
-  register: ifttt_notification
+    ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
   when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
-# Unpack the input file
+
+# Run the unpack benchmark and store the results
 - name: Get the size of the packed path
   command: "du -sk {{ packed_path }}"
   register: packed_size_raw
@@ -105,19 +106,16 @@
   copy:
     content: "Packed Size: {{ packed_size }} Kb"
     dest: "{{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/packed_size.log"
-- name: Send a IFTTT notification that the unpack benchmark has finished
-  uri:
-    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
-    method: POST
-    body: "{
+- include_tasks: ../utils/ifttt.yml
+  vars:
+    ifttt_job: "benchmark-notification"
+    ifttt_body: "{
           \"Title\": \"Unpack Benchmark Finished\",
-          \"Input File\": \"{{ input_path }}\",
+          \"Input File\": \"{{ input_file_name.stdout }}\",
           \"Input File Size\": \"{{ input_size }} Kb\",
           \"Packed File Size\": \"{{ packed_size }} Kb\",
-    }"
-    body_format: json
-    status_code: 200
-  register: ifttt_notification
+        }"
+    ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
   when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
 
 # Cleanup
@@ -148,18 +146,14 @@
     state: directory
 
 # Let us know when we are done
-- name: Send a IFTTT notification that the benchmark cleanup has finished
-  uri:
-    url: "https://maker.ifttt.com/trigger/benchmark-notification/json/with/key/{{ ifttt_test_webhook_key }}"
-    method: POST
-    body: "{
-          \"Title\": \"Cleanup Finished\",
-          \"Input File\": \"{{ input_path }}\",
-          \"Input Size\": \"{{ input_size }} Kb\",
-          \"Packed Size\": \"{{ packed_size}} Kb \",
+- include_tasks: ../utils/ifttt.yml
+  vars:
+    ifttt_job: "benchmark-notification"
+    ifttt_body: "{
+        \"Title\": \"Cleanup Finished\",
+        \"Input File\": \"{{ input_file_name.stdout }}\",
+        \"Input File Size\": \"{{ input_size }} Kb\",
+        \"Packed File Size\": \"{{ packed_size }} Kb\",
         }"
-    body_format: json
-    status_code: 200
-  register: ifttt_notification
+    ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
   when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
-

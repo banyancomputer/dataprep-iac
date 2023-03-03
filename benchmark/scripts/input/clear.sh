@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source our environment variables
-. env/env.benchmark
+. env/env.instance
 
 # Check if our Benchmarks are still running
 

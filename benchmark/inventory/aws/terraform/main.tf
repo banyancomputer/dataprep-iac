@@ -82,8 +82,7 @@ module "service" {
     # The instance type we want to use. This is a 32 core ARM instance.
     instance_type = "r6g.8xlarge"
     # The tenancy for this instance. Your AWS account may not have enough capacity to run this instance type with a dedicated tenancy.
-#    tenancy       = "dedicated"
-    tenancy       = "default"
+    tenancy       = "dedicated"
     # The AMI we want to use for our instance. This filter for Amazon Linux 2 AMI for ARM64.
     ami_filter    = "amzn2-ami-hvm-*-arm64-gp2"
     # The volume type of instance storage.

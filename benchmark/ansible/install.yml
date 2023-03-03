@@ -3,6 +3,8 @@
 # - Git, Rust, Cargo, the nightly version of Rust installed on the host
 # Arguments:
 # -e bench_path=/home # The directory where we clone the Dataprep repo and build the benches
+# -e dataprep_repo='' # The Dataprep repo to use
+# -e dataprep_branch='' # The Dataprep branch to use
 
 - hosts: all
   tasks:
@@ -29,7 +31,8 @@
     # Clone and install the Dataprep repo
     - name: Clone the dataprep repo
       git:
-        repo: https://github.com/banyancomputer/dataprep.git
+        repo: "{{ dataprep_repo }}"
+        version: "{{ dataprep_branch }}"
         dest: "{{ bench_path }}/dataprep"
         update: yes
     # For now, just wipe target and install the binary

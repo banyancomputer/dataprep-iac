@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Source our environment variables
-. env/env.benchmark
+. env/env.instance
+. env/env.ifttt
+. env/env.generate
 
 # Run the Benchmark on the Target system
 # Benching script handles populating inputs and cleaning up outputs
@@ -18,4 +20,4 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -e "file_structures_size=$FILE_STRUCTURES_SIZE" \
   -e "file_structures_max_width=$FILE_STRUCTURES_MAX_WIDTH" \
   -e "file_structures_max_depth=$FILE_STRUCTURES_MAX_DEPTH" \
-  ./ansible/generate.yml
+  ./ansible/input/generate.yml
