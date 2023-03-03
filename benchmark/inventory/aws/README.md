@@ -1,77 +1,81 @@
+# AWS
+AWS provides a selection of on-demand dedicated servers we can use for testing.
 
-## Provisioning and testing on AWS
-To run test on AWS, do the following:
-### Configure your environment
-- move `env.ec2.benchmark` to `env.benchmark`
-- Configure your environment variables in `env.benchmark` before running the following commands. See that file for more information.
-- Import AWS keys into your environment with the AWS CLI
-### Provisioning AWS infrastructure
+## Instance Architecture
+- We use a single Ec2 instance for running the benchmark.
+- We use a single EBS volume for storing the data we want to test.
+- We use a single EBS volume for storing the outputs of `dataprep pack`.
+- We use a single EBS volume for storing the outputs of `dataprep unpack`.
+- All other storage is on the instance itself.
+
+## Configuring the instance
+We use terraform for provisioning and managing the AWS infrastructure.
+See `terraform/main.tf` for more information configuring the instance. You should be able to configure:
+- The instance
+  - Type
+  - Tenancy
+  - Volume
+  - etc.
+- The volumes
+  - Type
+  - Size (individually)
+  - etc.
+Be sure to commit any changes you make to `terraform/main.tf` to the repository, so they can cross-referenced with results.
+
+## Provisioning the instance
+- Make sure you have terraform installed
+- Make sure you have the AWS CLI installed
+- Make sure you have the AWS CLI configured with proper AWS credentials
+- Then, set up the instance with the following commands:
 ```bash
 # Move to the terraform directory
 cd terraform
-```
-```bash
-# Source your environment variables. They have important information for terraform.
-source ../env/env.benchmark
 ```
 ```bash
 # Initialize terraform (if you haven't already)
 terraform init
 ```
 ```bash
+# Plan the infrastructure
+terraform plan
+```
+```bash
 # Deploy the infrastructure
 terraform apply
 ```
-
-Terraform should populate a `env/env.ssh` file to facilitate SSH access to the instance.
-Terraform should populate `inventory/awshost` with the inventory of the instance.
-
-You should be able to SSH into the instance with the following command:
+Terraform should:
+- save ssh keys on your local machine
+- populate a `env.ssh` file with the information you need to SSH into the instance
+- populate `host` with the inventory of the instance (used by ansible)
+For example:
 ```bash
-source env/env.ssh
+# Navigate to `inventory/aws`
+cd ..
+# Source the environment variables
+source env.ssh
+# SSH into the instance
 ssh -i $EC2_PEM_PATH ec2-user@$EC2_PUBLIC_DNS
 ```
 
-Finally, mount the volumes on the instance and install any dependencies:
+## Changing the instance
+You can make more changes to the instance by editing `terraform/main.tf` and running `terraform apply` again.
 
-```bash
-# Set up the volumes on our Cloud instance and install git, rust, for the ec2-user
-./ec2_setup.sh
-```
+## Setting up the instance
+Before you this instance is ready to use, you need to: 
+- Install dependencies that the ec2-user will need to install tools and run the benchmark
+- Mount the volumes on the instance
 
-Note, the instance configured right now with a r6g.8xlarge ~~dedicated~~ instance.
-You might need to contact your AWS administrator to get access to this instance type.
-See `terraform/main.tf` for more information or to configure a different instance type, and
-`terraform/service/ec2.tf` to turn on or off dedicated instances.
+After appropriately configuring and moving `env/env.instance.aws`, you can do this with the following commands:
+```bash
+# Return to the root of the `benchmark` directory
+cd ../../..
+# Set up the instance
+./scripts/setup.sh
+```
+You should only need to do this once, unless you destroy the EC2 instance.
 
-### Running the test pipeline
-```bash
-# Install the benchmark on the remote instance 
-./install.sh
-```
-You are responsible for ensuring that the `INPUT_PATH` is populated with the data you want to test. The `INPUT_PATH` is configured in `env.benchmark`.
-You can use this script to populate the `INPUT_PATH` with the data you want to test:
-```bash
-# Generate fake files for testing. See env.benchmark for more information.
-./generate.sh
-```
-```bash
-# Run the tests
-./benchmark.sh
-```
-```bash
-# Check the status of a long-running benchmark
-./check.sh
-```
-
-You should see the results of tests in the `$BENCH_PATH/dataprep/target/criterion` directory on the remote instance.
-```bash
-# You can copy them to your local machine with
-./result.sh
-```
-All test results run on this host should appear in your working directory in a folder called `local-result`.
-
-### Destroying AWS infrastructure
+### Destroying the instance 
+Once you are done with the instance, you can destroy the AWS infrastructure with the following commands:
 ```
 cd terraform
 terraform destroy

@@ -1,9 +1,10 @@
 # Generate input for the benchmark using the fake-file tool
 # -e input_path=/home/dataprep/input
-# -e file_structures=simple,skinny,...
+# -e file_structures=Simple,Deep,...
 # -e file_structures_size=1024
 # -e file_structures_max_width=2
 # -e file_structures_max_depth=2
+# -e ifttt_test_webhook_key=...
 
 - hosts: all
   name: Generate input for the benchmark using the fake-file tool

@@ -40,38 +40,33 @@ resource "random_string" "deploy_id" {
 
 # The name of our service
 variable "service_name" {
-  default = "dataprep-test"
+  default = "dataprep-benchmark"
 }
 
-# Environment variables for EBS configuration
+# What device name to use for the input volume
+# Don't change this unless you know what you're doing
 variable "INPUT_DEVICE" {
-  #  default     = "/dev/sdf"
-  description = "The device name for the input set"
+  default     = "/dev/sdf"
+  description = "The device name for the input volume"
 }
 
+# What device name to use for the packed volume
+# Don't change this unless you know what you're doing
 variable "PACKED_DEVICE" {
-  #  default     = "/dev/sdg"
-  description = "The device name for the packed set"
+  default     = "/dev/sdg"
+  description = "The device name for the packed volume"
 }
 
+# What device name to use for the unpacked volume
+# Don't change this unless you know what you're doing
 variable "UNPACKED_DEVICE" {
-  #  default     = "/dev/sdh"
-  description = "The device name for the unpacked set"
-}
-
-variable "INPUT_SIZE_GB" {
-  #  default     = "125"
-  description = "The size of a single input in GB"
-}
-
-variable "TOTAL_INPUT_SIZE_GB" {
-  #  default     = "250"
-  description = "The total size of the input set in GB"
+  default     = "/dev/sdh"
+  description = "The device name for the unpacked volume"
 }
 
 /* Deploy the infrastructure for our service */
 module "service" {
-  source = "service"
+  source = "./service"
 
   # AWS configuration
   aws_region            = "us-east-2"
@@ -79,34 +74,44 @@ module "service" {
   # Service configuration
   name                  = var.service_name
   deploy_id             = random_string.deploy_id.result
+
+  ## CONFIGURE THESE FOR YOUR OWN BENCHMARKING PURPOSES ##
+
   # Ec2 configuration
-  # TODO: Replace with a larger instance type, something like r6g.8xlarge
-  ec2_config            = {
-    # This is the instance type we want to use for actual benchmarking. Change this if you want to use a different instance type
-    # This may affect performance of long running benchmarks and tasks
+  ec2_config = {
+    # The instance type we want to use. This is a 32 core ARM instance.
     instance_type = "r6g.8xlarge"
-    # Make sure we use a dedicated instance. Your AWS account may not have enough capacity to run this instance type.
-    tenancy       = "dedicated"
-    # This is the AMI we want to use for our instance. This filter for Amazon Linux 2 AMI for ARM64.
+    # The tenancy for this instance. Your AWS account may not have enough capacity to run this instance type with a dedicated tenancy.
+#    tenancy       = "dedicated"
+    tenancy       = "default"
+    # The AMI we want to use for our instance. This filter for Amazon Linux 2 AMI for ARM64.
     ami_filter    = "amzn2-ami-hvm-*-arm64-gp2"
-    monitoring    = "false"
+    # The volume type of instance storage.
     volume_type   = "gp2"
-    volume_size   = "50" # Needed for building and storing results
+    # The size of the instance storage in GiB. This should be able to hold manifests and results.
+    volume_size   = "50"
+    # Do we want to monitor the instance? Usually not.
+    monitoring = false
   }
+
   # EBS configuration
   ebs_config = {
-    # Cheap io optimized HDDs
-    type                 = "gp2"
-    # Allocates 1.1 X the size of the set size for all sets
-    # If an allocated size is less than 125 GiB, it will be set to 125 GiB
+    # The type of EBS volume we want to use
+    type                 = "st1"
+    # The device names to set for the EBS volumes
     input_device_name    = var.INPUT_DEVICE
     packed_device_name   = var.PACKED_DEVICE
     unpacked_device_name = var.UNPACKED_DEVICE
-  }
-  # Our Test Set configuration
-  input_config = {
-    size       = var.INPUT_SIZE_GB
-    total_size = var.TOTAL_INPUT_SIZE_GB
+
+    # The sizes to allocate for the EBS volumes in GiB
+    # Note: Be sure to account for Filesystem overhead when setting these values
+    #       We set ext4 as the filesystem for the EBS volumes (~5% overhead)
+    # Note: Be sure to think about what sort of data you're going to be storing on these volumes,
+    #       and how they might be affected by the implementation of `dataprep` on the device.
+    #       For example, random utf8 files will not compress well, possibly requiring more space in the packed volume.
+    input_volume_size    = 125 # 120 GiB
+    packed_volume_size   = 125 # 120 GiB
+    unpacked_volume_size = 125 # 120 GiB
   }
 }
 # This is a hack to make sure the Ansible inventory is generated after the EC2 instance is created
@@ -117,14 +122,14 @@ resource "null_resource" "ansible_inventory" {
     ec2_pem_path   = module.service.ec2_pem_path
     this_once      = true
   }
-  # Overwrite ../inventory/awshost with the public DNS of the EC2 instance and the path to the PEM file
-  # Then write the public DNS and path to pem to ../pipeline_throughput.sh-aws-ssh to access in a shell
+  # Overwrite ../inventory/aws/host with the public DNS of the EC2 instance and the path to the PEM file
+  # Overwrite ../env.ssh with the public DNS of the EC2 instance and the path to the PEM file
   provisioner "local-exec" {
     command = <<-EOT
-      echo '# This file is autogenerated by terraform' > ../env/env.ssh
-      echo 'EC2_PEM_PATH=${module.service.ec2_pem_path}' >> ../env/env.ssh
-      echo 'EC2_PUBLIC_DNS=${module.service.ec2_public_dns}' >> ../env/env.ssh
-      echo '${module.service.ec2_public_dns} ansible_ssh_private_key_file=${module.service.ec2_pem_path}' > ../inventory/awshost
+      echo '# This file is autogenerated by terraform' > ../env.ssh
+      echo 'EC2_PEM_PATH=${module.service.ec2_pem_path}' >> ../env.ssh
+      echo 'EC2_PUBLIC_DNS=${module.service.ec2_public_dns}' >> ../env.ssh
+      echo '${module.service.ec2_public_dns} ansible_ssh_private_key_file=${module.service.ec2_pem_path}' > ../host
     EOT
   }
 }

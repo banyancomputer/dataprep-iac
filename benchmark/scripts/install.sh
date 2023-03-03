@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source pipeline_throughput.sh-aws
-. env/env.benchmark
+. env/env.instance
 
 # Install necessary dependencies for running tests on the Target system
 

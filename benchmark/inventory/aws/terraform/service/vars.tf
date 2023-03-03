@@ -46,21 +46,12 @@ variable "ebs_config" {
     input_device_name    = "/dev/sdf" # The device to mount the EBS volume on the EC2 instance
     packed_device_name   = "/dev/sdg" # The device to mount the EBS volume on the EC2 instance
     unpacked_device_name = "/dev/sdh" # The device to mount the EBS volume on the EC2 instance
+    input_volume_size    = "100" # in GB. How big of a volume to mount on the Ec2
+    packed_volume_size   = "100" # in GB. How big of a volume to mount on the Ec2
+    unpacked_volume_size = "100" # in GB. How big of a volume to mount on the Ec2
   }
 }
 
-/* Test Set Configuration */
-variable "input_config" {
-  description = "Service Configuration for Test Set"
-  type        = map(any)
-  # Set config values as strings and convert to the appropriate type.
-  default     = {
-    // Size of a single input in GB
-    size       = 1
-    // Size of all inputs in GB
-    total_size = 1
-  }
-}
 
 /* VPC Configuration. We need one public subnet and two private */
 

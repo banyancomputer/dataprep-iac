@@ -13,7 +13,7 @@
 # -e manifest_path=/home/dataprep/manifest
 # -e result_path=/home/dataprep/result
 # -e ifttt_test_webhook_key=YOUR_KEY
-# ./benchmark.yml
+# ./run.yml
 
 # TODO (amiller68): Change file flags to facts
 

@@ -5,10 +5,6 @@ Repository for orchestrating benchmarks in local and remote environments.
 ## Dependencies
 - Python
 - Ansible
-- Terraform
-- Git
-- Rust +nightly
-- time
 
 ## Benchmark Process Overview
 This repository provides IaC meant for running `dataprep` on large amounts of data.
@@ -52,13 +48,21 @@ So long as you setup your inputs to reflect these assumptions, you should be abl
   - This is an EC2 dedicated server from AWS.
 - local
   - This is your local machine.
-  
-## Setting up your instance
-Documentation for setting up your instance can be found in `inventory/<instance_type>/README.md`.
 
-## Setting up your local environment to target that instance
-Once you've read the documentation for your instance type, copy `env/env.benchmark.<instance_type>` to `env/env.benchmark` and configure it to your liking.
-Each example environment file has a description of what each variable does and how to configure it.
+## Setting up your environment 
+Read the documentation for your instance type in `inventory/<instance_type>/README.md`.
+Once you've read the documentation for your instance type, copy `env/env.instance.<instance_type>` to `env/env.instance` and configure it to your liking.
+Each example environment file has a description of what each variable does and how to configure it. 
+
+## Setting up your instance
+After reading documentation for your instance type, you should be able to provision and setup your instance.
+Follow the instructions in `inventory/<instance_type>/README.md` to provision your instance.
+If applicable, follow the instructions in `inventory/<instance_type>/README.md` to setup your instance:
+
+```bash
+# Setup the instance
+./scripts/setup.sh
+```
 
 ## (Finally) Running benchmarks 
 

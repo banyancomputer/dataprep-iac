@@ -10,4 +10,4 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$TARGET_USER" \
   -e "input_path=$INPUT_PATH" \
-  ./ansible/clear_generate.yml
+  ./ansible/input/clear.yml

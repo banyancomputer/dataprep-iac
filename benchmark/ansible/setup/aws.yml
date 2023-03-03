@@ -11,10 +11,6 @@
 # - <input_mount> # The directory where benchmark input exists on its device
 # - <packed_mount> # The directory where the packed inputs exist on its device
 # - <unpacked_mount> # The directory where the unpacked inputs exist on its device
-# We check that each path has enough space for the benchmarking
-# - <input_mount>.available_space >= total_input_size_gb
-# - <packed_mount>.available_space >= input_size_gb
-# - <unpacked_mount>.available_space >= input_size_gb
 # Arguments:
 # -e input_device=/dev/sdb # The device to use for the test set
 # -e input_mount=/home/input # The directory where the test set exists on its device
@@ -22,11 +18,14 @@
 # -e packed_mount=/home/packed # The directory where the packed test set exists on its device
 # -e unpacked_device=/dev/sdd # The device to use for the unpacked test set
 # -e unpacked_mount=/home/unpacked # The directory where the unpacked test set exists on its device
-# -e input_size_gb=100 # The size of the test set in GB
-# -e total_input_size_gb=1000 # The total size of the test set in GB
 
 - hosts: all
   name: Get our Ec2 instance ready for testing
+  # Set the default values for the variables
+  vars:
+    input_device: /dev/sdf
+    packed_device: /dev/sdg
+    unpacked_device: /dev/sdh
   tasks:
     # Install the dependencies - Doesn't check if they are already installed
     # Update Yum
@@ -79,7 +78,7 @@
 
     # Create and Mount Filesystems on the devices - Doesn't check if they are already created, instead just tries to create them
     # Create and mount Filesystem for the test set
-    - name: Create a Filesystem on the test set device
+    - name: Create a Filesystem on the input device
       become: yes
       filesystem:
         dev: "{{ input_device }}"
@@ -159,35 +158,3 @@
         path: "{{ unpacked_mount }}"
         owner: "ec2-user"
         recurse: yes
-
-    # Double check if we have enough space to run a benchmark
-    # See if the input path can hold file_structures_count * file_structures_size GB
-    - name: Check the available space on the input path
-      shell: df -h {{ input_mount }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/G//' | sed 's/Mi/0.001/'
-      register: input_size_available
-      ignore_errors: yes
-      when: input_mount is defined
-    - name: Check if the Input Path can hold all the file structures we want to benchmark
-      fail:
-        msg: "The test set path does not have enough space to hold the test set: {{ input_size_available.stdout }} out of {{ total_input_size_gb }} "
-      when: input_size_available is defined and input_size_available.stdout is defined and input_size_available.stdout | int < total_input_size_gb | int
-    # See if the packed directory can hold file_structures_count GB
-    - name: Check the available space on the packed path
-      shell: df -h {{ input_mount }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' |  sed 's/G//' | sed 's/Mi/0.001/'
-      register: packed_size_available
-      ignore_errors: yes
-      when: packed_mount is defined
-    - name: Check if the packed directory can hold a single packed file structure
-      fail:
-        msg: "The packed path does not have enough space to hold a packed file structure: {{ packed_size_available.stdout }} out of {{ input_size_gb }}"
-      when: packed_size_available is defined and packed_size_available.stdout is defined and packed_size_available.stdout | int < input_size_gb | int
-    # See if the unpacked directory can hold file_structures_count GB
-    - name: Check the available space on the unpacked path
-      shell: df -h {{ input_mount }} | tail -n 1 | awk '{print $4}' | sed 's/Gi//' | sed 's/G//' | sed 's/Mi/0.001/'
-      register: unpacked_size_available
-      ignore_errors: yes
-      when: unpacked_mount is defined
-    - name: Check if the unpacked directory can hold a single unpacked file structure
-      fail:
-        msg: "The unpacked path does not have enough space to hold the unpacked test set: {{ unpacked_size_available.stdout }} out of {{ input_size_gb }}"
-      when: unpacked_size_available is defined and unpacked_size_available.stdout is defined and unpacked_size_available.stdout | int < input_size_gb | int
