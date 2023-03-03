@@ -7,5 +7,5 @@ This repository contains the infrastructure as code for the Dataprep project.
 ### benchmark
 
 Used to configure, generate data for, and run large scale benchmarks on `dataprep` tool. 
-Can target local or remote instances provisioned.
+Can target local machines or remote instances.
 See the [README](benchmark/README.md) for more information.
