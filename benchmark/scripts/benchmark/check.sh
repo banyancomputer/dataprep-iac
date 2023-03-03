@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source our environment variables
-. env/env.benchmark
+. env/env.instance
 
 # Check if our Benchmarks are still running
 
@@ -10,4 +10,4 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$TARGET_USER" \
   -e "bench_path=$BENCH_PATH" \
-  ./ansible/check.yml
+  ./ansible/benchmark/check.yml

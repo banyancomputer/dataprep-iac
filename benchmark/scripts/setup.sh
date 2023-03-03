@@ -24,6 +24,11 @@ if [[ "$INSTANCE_PROVIDER" = "aws" ]]; then
     ./ansible/setup/aws.yml
 elif [[ "$INSTANCE_PROVIDER" = "hetzner" ]]; then
   echo "Setting up Hetzner instance..."
+  # Run the hetzner setup playbook
+  ansible-playbook -i "$ANSIBLE_INVENTORY" \
+    -u "$TARGET_USER" \
+    -e "bench_path=$BENCH_PATH" \
+    ./ansible/setup/hetzner.yml
 else
   echo "$INSTANCE_PROVIDER is not a valid instance provider."
   echo "Instance does not require setup."

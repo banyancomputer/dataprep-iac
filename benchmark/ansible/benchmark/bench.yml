@@ -52,6 +52,8 @@
         -m {{ manifest_path }}/{{ input_file_name.stdout }}.json; 
   "
   register: pack_result
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
 - name: Log the result to the result path
   shell: "
     echo 'STD_OUT:\n{{ pack_result.stdout }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/result.log;
@@ -93,6 +95,8 @@
         -m {{ manifest_path }}/{{ input_file_name.stdout }}.json;
   "
   register: unpack_result
+  environment:
+    PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
 - name: Log the result to the result path
   shell: "
     echo 'STD_OUT:\n{{ unpack_result.stdout }}' >> {{ result_path }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/result.log;

@@ -1,6 +1,7 @@
 # dataprep-test
 
 Repository for orchestrating benchmarks in local and remote environments.
+All you have to do is setup some keys, write some configs, and run the scripts :tada:
 
 ## Dependencies
 - Python

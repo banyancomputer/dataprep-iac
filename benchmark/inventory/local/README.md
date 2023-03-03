@@ -11,10 +11,9 @@ We don't provide local setup scripts, but so long as:
   - git
   - rust (nightly)
   - time (for `time` command). This should be the Linux version, not the BSD version.
-  - (optional) lshw 
 You should be good to go!
 
 ### Destroying the instance 
-sledgehammer it
+Don't worry about it. THis is supposed to stay available.
 
 done! :tada: 
