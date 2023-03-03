@@ -23,6 +23,6 @@ cd ../../..
 You should only need to do this once -- probably not ever unless you need to re-install dependencies or the dependencies change.
 
 ### Destroying the instance
-sledgehammer it
+Don't worry about it. THis is supposed to stay available.
 
 done! :tada: 

@@ -14,6 +14,6 @@ We don't provide local setup scripts, but so long as:
 You should be good to go!
 
 ### Destroying the instance 
-Don't worry about it. THis is supposed to stay available.
+sledgehammer it
 
 done! :tada: 
