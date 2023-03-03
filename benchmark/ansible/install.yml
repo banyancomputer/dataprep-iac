@@ -1,0 +1,71 @@
+# Install our Rust binaries on the host
+# Requires having
+# - Git, Rust, Cargo, the nightly version of Rust installed on the host
+# Arguments:
+# -e bench_path=/home # The directory where we clone the Dataprep repo and build the benches
+# -e dataprep_repo='' # The Dataprep repo to use
+# -e dataprep_branch='' # The Dataprep branch to use
+
+- hosts: all
+  tasks:
+    # Check if the bench_path exists
+    - name: Check if the bench_path exists
+      stat:
+        path: "{{ bench_path }}"
+      register: bench_path_exists
+    # Check if the bench_path is a directory owned by the user
+    - name: Check if the bench_path is a directory owned by the user
+      stat:
+        path: "{{ bench_path }}"
+        get_attributes: yes
+      register: bench_path_stat
+      when: bench_path_exists.stat.exists
+    # Create and own bench_path if it doesn't exist
+    - name: Create and own bench_path if it doesn't exist
+      file:
+        path: "{{ bench_path }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+      when: not bench_path_exists.stat.exists
+
+    # Clone and install the Dataprep repo
+    - name: Clone the dataprep repo
+      git:
+        repo: "{{ dataprep_repo }}"
+        version: "{{ dataprep_branch }}"
+        dest: "{{ bench_path }}/dataprep"
+        update: yes
+    # For now, just wipe target and install the binary
+    - name: Wipe target
+      shell: cargo +nightly clean
+      args:
+        chdir: "{{ bench_path }}/dataprep"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+    - name: Install the Dataprep binary
+      shell: cargo +nightly install --path .
+      args:
+        chdir: "{{ bench_path }}/dataprep/dataprep"
+      environment:
+        CARGO_PROFILE_RELEASE_DEBUG: 1
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Clone and install our fake-file repo
+    - name: Clone the fake-file repo
+      git:
+        repo: https://github.com/banyancomputer/fake-file.git
+        dest: "{{ bench_path }}/fake-file"
+        update: yes
+    # For now, just wipe target and install the binary
+    - name: Wipe target
+      shell: cargo +nightly clean
+      args:
+        chdir: "{{ bench_path }}/fake-file"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+    - name: Install the fake-file binary
+      shell: cargo +nightly install  --path .
+      args:
+        chdir: "{{ bench_path }}/fake-file"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"

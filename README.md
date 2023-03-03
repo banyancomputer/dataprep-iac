@@ -4,8 +4,8 @@ This repository contains the infrastructure as code for the Dataprep project.
 
 ## Tools
 
-### pipeline-benchmark
+### benchmark
 
-Used to configure, generate data for, and run large scale tests on the pipeline.
-Can target local or remote instances provisioned with Terraform.
-See the [README](pipeline-benchmark/README.md) for more information.
+Used to configure, generate data for, and run large scale benchmarks on `dataprep` tool. 
+Can target local or remote instances provisioned.
+See the [README](benchmark/README.md) for more information.

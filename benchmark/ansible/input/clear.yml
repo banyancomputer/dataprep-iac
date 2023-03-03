@@ -1,0 +1,15 @@
+# Clear the input path of all files
+
+- hosts: all
+  name: Clear the input path of all files
+  tasks:
+    # Remove the files in the input path
+    - name: Remove the directory in the input path
+      file:
+        path: "{{ input_path }}"
+        state: absent
+    # Make sure the input path is an empty directory
+    - name: Make sure the input path is an empty directory
+      file:
+        path: "{{ input_path }}"
+        state: directory

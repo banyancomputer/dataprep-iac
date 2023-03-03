@@ -1,0 +1,55 @@
+# Setup an Ec2 instance + Mounted EBS volumes for benchmarking
+# It should have the following software dependencies:
+# - git
+# - rust
+# - rust nightly
+
+- hosts: all
+  name: Get our Hetzner instance ready for benchmarking
+  tasks:
+    # Install the dependencies - Doesn't check if they are already installed
+    # Update Yum
+    - name: Update Apt
+      become: yes
+      apt:
+        name: "*"
+        state: latest
+    # Install Dependencies
+    - name: Install Dependencies
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gcc
+        - git
+    # Download and install Rustup
+    - name: Download Rustup Installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /home/user/rustup.rs
+        mode: '0755'
+        force: 'yes'
+      tags:
+        - rust
+    - name: install rust/cargo
+      shell: /home/user/rustup.rs -y
+      tags:
+        - rust
+    - name: Remove Rustup Installer
+      file:
+        path: /home/user/rustup.rs
+        state: absent
+    - name: Install the nightly version of rust
+      shell: rustup toolchain install nightly
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Make the user the owner of the benchmarking directory
+    - name: Make the current user the owner of the benchmarking directory
+      become: yes
+      file:
+        path: "{{ bench_path }}"
+        owner: "{{ ansible_user }}"
+        group: "user"
+        recurse: yes

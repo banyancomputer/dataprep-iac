@@ -1,0 +1,161 @@
+# Setup an Ec2 instance + Mounted EBS volumes for benchmarking
+# It should have the following software dependencies:
+# - git
+# - rust
+# - rust nightly
+# We should check that the host has the following devices mounted:
+# - <input_device> # The device to use for benchmark input
+# - <packed_device> # The device to use for the packed inputs
+# - <unpacked_device> # The device to use for the unpacked inputs
+# We check that those devices are mounted at the following paths:
+# - <input_mount> # The directory where benchmark input exists on its device
+# - <packed_mount> # The directory where the packed inputs exist on its device
+# - <unpacked_mount> # The directory where the unpacked inputs exist on its device
+# Arguments:
+# -e input_device=/dev/sdb # The device to use for the test set
+# -e input_mount=/home/input # The directory where the test set exists on its device
+# -e packed_device=/dev/sdc # The device to use for the packed test set
+# -e packed_mount=/home/packed # The directory where the packed test set exists on its device
+# -e unpacked_device=/dev/sdd # The device to use for the unpacked test set
+# -e unpacked_mount=/home/unpacked # The directory where the unpacked test set exists on its device
+
+- hosts: all
+  name: Get our Ec2 instance ready for testing
+  # Set the default values for the variables
+  vars:
+    input_device: /dev/sdf
+    packed_device: /dev/sdg
+    unpacked_device: /dev/sdh
+  tasks:
+    # Install the dependencies - Doesn't check if they are already installed
+    # Update Yum
+    - name: Update Yum
+      become: yes
+      yum:
+        name: "*"
+        state: latest
+    # Install Dependencies
+    - name: Install Dependencies
+      become: yes
+      yum:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - gcc
+        - perf
+        - openssl-devel
+        - git
+        - lshw
+    # Download and install Rustup
+    - name: Download Rustup Installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /home/ec2-user/rustup.rs
+        mode: '0755'
+        force: 'yes'
+      tags:
+        - rust
+    - name: install rust/cargo
+      shell: /home/ec2-user/rustup.rs -y
+      tags:
+        - rust
+    - name: Remove Rustup Installer
+      file:
+        path: /home/ec2-user/rustup.rs
+        state: absent
+    - name: Install the nightly version of rust
+      shell: rustup toolchain install nightly
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Make the user the owner of the benchmarking directory
+    - name: Make the current user the owner of the benchmarking directory
+      become: yes
+      file:
+        path: "{{ bench_path }}"
+        owner: "{{ ansible_user }}"
+        group: "ec2-user"
+        recurse: yes
+
+    # Create and Mount Filesystems on the devices - Doesn't check if they are already created, instead just tries to create them
+    # Create and mount Filesystem for the test set
+    - name: Create a Filesystem on the input device
+      become: yes
+      filesystem:
+        dev: "{{ input_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
+      ignore_errors: yes
+    - name: Mount the test set device
+      become: yes
+      mount:
+        path: "{{ input_mount }}"
+        src: "{{ input_device }}"
+        fstype: ext4
+        state: mounted
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+    # Create and mount Filesystem for the packed test set
+    - name: Create a Filesystem on the packed device
+      become: yes
+      filesystem:
+        dev: "{{ packed_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
+      ignore_errors: yes
+    - name: Mount the packed device
+      become: yes
+      mount:
+        path: "{{ packed_mount }}"
+        src: "{{ packed_device }}"
+        fstype: ext4
+        state: mounted
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+    # Create and mount Filesystem for the unpacked test set
+    - name: Create a Filesystem on the unpacked device
+      become: yes
+      filesystem:
+        dev: "{{ unpacked_device }}"
+        fstype: ext4
+        resizefs: yes
+        force: yes
+      # if the above fails, continue as if it succeeded - probably because the filesystem already exists
+      ignore_errors: yes
+    - name: Mount the unpacked device
+      become: yes
+      mount:
+        path: "{{ unpacked_mount }}"
+        src: "{{ unpacked_device }}"
+        fstype: ext4
+        state: mounted
+      # if the above fails, continue as if it succeeded - probably because the filesyste is already mounted
+      ignore_errors: yes
+
+    # Setup R/W permissions for the volumes
+    # Make the current user the owner of the test set directory
+    - name: Make the current user the owner of the test set directory
+      become: yes
+      file:
+        path: "{{ input_mount }}"
+        owner: "{{ ansible_user }}"
+        group: "ec2-user"
+        recurse: yes
+    # Make the current user the owner of the packed directory
+    - name: Make the current user the owner of the packed directory
+      become: yes
+      file:
+        path: "{{ packed_mount }}"
+        owner: "ec2-user"
+        recurse: yes
+    # Make the current user the owner of the unpacked directory
+    - name: Make the current user the owner of the unpacked directory
+      become: yes
+      file:
+        path: "{{ unpacked_mount }}"
+        owner: "ec2-user"
+        recurse: yes
