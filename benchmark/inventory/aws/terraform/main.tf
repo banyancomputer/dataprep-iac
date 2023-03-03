@@ -71,7 +71,7 @@ variable "TOTAL_INPUT_SIZE_GB" {
 
 /* Deploy the infrastructure for our service */
 module "service" {
-  source = "./service"
+  source = "service"
 
   # AWS configuration
   aws_region            = "us-east-2"

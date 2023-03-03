@@ -1,0 +1,1 @@
+ec2-3-134-205-123.us-east-2.compute.amazonaws.com ansible_ssh_private_key_file=~/.ssh/dataprep-test-ec2-key-y3sfypqh.pem
