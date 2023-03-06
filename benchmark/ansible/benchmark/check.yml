@@ -21,3 +21,9 @@
       debug:
         msg: "Benchmark in progress"
       when: benchmark_flag.stat.exists
+    - name: Get the contents of the flag file
+      shell: cat {{ bench_path }}/.benchmark
+      register: flag_file_contents
+    - name: Debug the contents of the flag file
+      debug:
+        msg: "{{ flag_file_contents.stdout }}"

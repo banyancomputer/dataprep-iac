@@ -32,7 +32,16 @@
         msg: "Benchmark is already running"
       when: benchmark_running.stat.exists
 
-    # Make sure the input path exists and has data in it
+    # Get version information about the dataprep repo
+    - name: Get the commit hash of the latest commit in the dataprep repo
+      shell: git rev-parse --short HEAD
+      args:
+        chdir: "{{ bench_path }}/dataprep"
+      register: latest_commit_hash
+    - name: Set the latest commit hash
+      set_fact:
+        dataprep_commit_hash: "{{ latest_commit_hash.stdout }}"
+    # Make sure the input path exists and has data in it. Record the contents of the input path
     - name: Make sure the input path exists
       file:
         path: "{{ input_path }}"
@@ -49,10 +58,15 @@
       file:
         path: "{{ bench_path }}/.benchmark"
         state: touch
-    # TODO: Populate the benchmark flag file with useful information about what is running
-    # TODO: Record information from lshw and lscpu to the result path
+    - name: Record the input path contents and the commit hash in the flag file
+      copy:
+        content: "
+          Inputs: {{ input_path_contents.stdout }}\n
+          Commit: {{ dataprep_commit_hash }}
+        "
+        dest: "{{ bench_path }}/.benchmark"
+        mode: 0644
 
-    # Get the current time on the host
     - name: Get the current time on the host
       shell: date +%s
       register: start_time
@@ -63,6 +77,8 @@
         ifttt_body: "{
           \"Title\": \"Benchmarking Started\",
           \"Time\": \"{{ start_time.stdout }}\",
+          \"Commit\": \"{{ dataprep_commit_hash }}\",
+          \"Inputs\": \"{{ input_path_contents.stdout }}\"
         }"
         # These need to be different names
         ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
@@ -92,7 +108,7 @@
     # Make sure a place for results exists in the result path
     - name: Make sure a directory exists in the result path for this run
       file:
-        path: "{{ result_path }}/{{ start_time.stdout }}"
+        path: "{{ result_path }}/{{ dataprep_commit_hash }}"
         state: directory
 
     # Run the throughput benchmark over the input space
@@ -123,6 +139,8 @@
         ifttt_body: "{
           \"Title\": \"Benchmarking Completed\",
           \"Time\": \"{{ current_time.stdout }}\",
+          \"Commit\": \"{{ dataprep_commit_hash }}\",
+          \"Inputs\": \"{{ input_path_contents.stdout }}\"
         }"
         # These need to be different names
         ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
