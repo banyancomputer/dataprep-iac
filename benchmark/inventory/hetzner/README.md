@@ -9,6 +9,11 @@ This is already taken care of. The server is setup with:
 - You can log in with an SSH key from the Banyan team
 - All you have to do is save our provided SSH key at `~/.ssh/id_hetzner` on your local machine
 - The `host` file in this directory contains the IP address of the server and is set up to use the SSH key at that path
+- If you want  to use a different host, make sure that it implements the same setup as the one we have described here, and change the `host` file accordingly to point to the new host.
+
+We currently have the following hosts setup:
+- AX101 @ 167.235.7.231
+- AX41-NVME @ 85.10.194.34
 
 ## Setting up the instance
 There's nothing do here except install dependencies.

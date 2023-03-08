@@ -108,7 +108,7 @@
     # Make sure a place for results exists in the result path
     - name: Make sure a directory exists in the result path for this run
       file:
-        path: "{{ result_path }}/{{ dataprep_commit_hash }}"
+        path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}"
         state: directory
 
     # Run the throughput benchmark over the input space

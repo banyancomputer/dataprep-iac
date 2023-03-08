@@ -19,7 +19,7 @@
     msg: "Running benchmark on {{ input_file_name.stdout }} ({{ input_size }} KB)"
 - name: Log where we store the results
   debug:
-    msg: "Storing results in {{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}"
+    msg: "Storing results in {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}"
 
 # Determine if this system supports time --verbose
 - name: Determine if this system supports time --verbose
@@ -38,7 +38,7 @@
 # Set up the result path
 - name: Make sure a directory exists in the result path for storing pack results
   file:
-    path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/pack"
+    path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack"
     state: directory
 
 # Run the pack benchmark and store the results
@@ -56,13 +56,13 @@
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
 - name: Log the result to the result path
   shell: "
-    echo 'STD_OUT:\n{{ pack_result.stdout }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/pack/result.log;
-    echo 'STD_ERR:\n{{ pack_result.stderr }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/pack/result.log;
+    echo 'STD_OUT:\n{{ pack_result.stdout }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/result.log;
+    echo 'STD_ERR:\n{{ pack_result.stderr }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/result.log;
   "
 - name: Log the size of the input file to the result path
   copy:
     content: "Input Size: {{ input_size }} Kb"
-    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/pack/input_size.log"
+    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/pack/input_size.log"
 - include_tasks: ../utils/ifttt.yml
   vars:
     ifttt_job: "benchmark-notification"
@@ -84,7 +84,7 @@
     packed_size: "{{ packed_size_raw.stdout.split('\t')[0] }}"
 - name: Make sure a directory exists in the result path for storing unpack results
   file:
-    path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/unpack"
+    path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack"
     state: directory
 - name: Benchmark unpacking the input path and record the result for {{ input_file_name.stdout }}
   shell: "
@@ -100,17 +100,17 @@
     PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
 - name: Log the result to the result path
   shell: "
-    echo 'STD_OUT:\n{{ unpack_result.stdout }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/unpack/result.log;
-    echo 'STD_ERR:\n{{ unpack_result.stderr }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/unpack/result.log;
+    echo 'STD_OUT:\n{{ unpack_result.stdout }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/result.log;
+    echo 'STD_ERR:\n{{ unpack_result.stderr }}' >> {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/result.log;
   "
 - name: Log the size of the input file to the result path
   copy:
     content: "Input Size: {{ input_size }} Kb"
-    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/unpack/input_size.log"
+    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/input_size.log"
 - name: Log the size of the packed file to the result path
   copy:
     content: "Packed Size: {{ packed_size }} Kb"
-    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ input_file_name.stdout }}/unpack/packed_size.log"
+    dest: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}/{{ input_file_name.stdout }}/unpack/packed_size.log"
 - include_tasks: ../utils/ifttt.yml
   vars:
     ifttt_job: "benchmark-notification"
