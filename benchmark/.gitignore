@@ -5,3 +5,5 @@ env/env.git
 
 # Ignore results by default
 results/
+
+.DS_Store
