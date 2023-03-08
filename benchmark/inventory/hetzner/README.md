@@ -15,6 +15,11 @@ We currently have the following hosts setup:
 - AX101 @ 167.235.7.231
 - AX41-NVME @ 85.10.194.34
 
+You should be able to log in with the following command:
+```bash
+ssh -i ~/.ssh/id_hetzner user@<ip address>
+```
+
 ## Setting up the instance
 There's nothing do here except install dependencies.
 
