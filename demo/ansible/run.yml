@@ -1,0 +1,26 @@
+- hosts: all
+  name: Run our benchmarks
+  tasks:
+    - name: Make sure the packed path exists
+      file:
+        path: "{{ packed_path }}"
+        state: directory
+    - name: Make sure manifest.json does not exist
+      file:
+        path: "manifest.json"
+        state: absent
+    - name: Pack the dataset with dataprep in a new tmux session
+      shell: "tmux new -d dataprep pack -i {{ dataset_path }} -o {{ packed_path }} -m manifest.json; tmux wait -S dataprep"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+    - name: Wait for dataprep to finish packing the dataset
+      shell: "tmux wait -t dataprep"
+      ignore_errors: yes
+    - include_tasks: ../utils/ifttt.yml
+      vars:
+        ifttt_job: "benchmark-notification"
+        ifttt_body: "{
+          \"Title\": \"Demo is packed up!\",
+        }"
+        ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
+      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""

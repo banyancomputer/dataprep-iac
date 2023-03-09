@@ -1,0 +1,74 @@
+- hosts: all
+  name: Get our Hetzner instance ready for benchmarking
+  tasks:
+    # Install the dependencies - Doesn't check if they are already installed
+#    # Update Yum
+    #    - name: Update Apt
+    #      become: yes
+    #      apt:
+    #        name: "*"
+    #        state: latest
+    #        force_apt_get: true
+    # Install Dependencies
+    - name: Install Dependencies
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state: present
+        force_apt_get: true
+      with_items:
+        - gcc
+        - git
+        - aria2
+        - tmux
+    # Download and install Rustup
+    - name: Download Rustup Installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /home/user/rustup.rs
+        mode: '0755'
+        force: 'yes'
+      tags:
+        - rust
+    - name: install rust/cargo
+      shell: /home/user/rustup.rs -y
+      tags:
+        - rust
+    - name: Remove Rustup Installer
+      file:
+        path: /home/user/rustup.rs
+        state: absent
+    - name: Install the nightly version of rust
+      shell: rustup toolchain install nightly
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Clone and install the Dataprep repo
+    - name: Clone the dataprep repo
+      git:
+        repo: "{{ dataprep_repo }}"
+        version: "{{ dataprep_branch }}"
+        dest: "dataprep"
+        update: yes
+    # For now, just wipe target and install the binary
+    - name: Wipe target
+      shell: cargo +nightly clean
+      args:
+        chdir: "dataprep"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+    - name: Install the Dataprep binary
+      shell: cargo +nightly install --path dataprep
+      args:
+        chdir: "dataprep"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Make sure there's a directory for datasets
+    - name: Check if the  dataset_path exists
+      stat:
+        path: "{{ dataset_path }}"
+    # Make sure the packed path exists
+    - name: Check if the packed_path exists
+      stat:
+        path: "{{ packed_path }}"

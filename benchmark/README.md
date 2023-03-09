@@ -1,4 +1,4 @@
-# dataprep-test
+# dataprep-iac: Benchmark
 
 Repository for orchestrating benchmarks in local and remote environments.
 All you have to do is setup some keys, write some configs, and run the scripts :tada:
@@ -8,7 +8,7 @@ All you have to do is setup some keys, write some configs, and run the scripts :
 - Ansible
 
 ## Benchmark Process Overview
-This repository provides IaC meant for running `dataprep` on large amounts of data.
+This directory provides IaC meant for running `dataprep` on large amounts of data.
 It is meant to be used a performance metric tool for realistic workflows.
 As such it runs the whole `pack` and `unpack` process on a series of inputs, and measures the time it takes to complete.
 It does *not* perform multiple iterations of the process on the same input -- it is not a statistically driven benchmark.
