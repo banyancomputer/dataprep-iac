@@ -1,1 +1,1 @@
-85.10.194.34 ansible_ssh_private_key_file=~/.ssh/id_hetzner
+167.235.7.231 ansible_ssh_private_key_file=~/.ssh/id_hetzner

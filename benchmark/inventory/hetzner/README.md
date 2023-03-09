@@ -13,7 +13,8 @@ This is already taken care of. The server is setup with:
 
 We currently have the following hosts setup:
 - AX101 @ 167.235.7.231
-- AX41-NVME @ 85.10.194.34
+
+[//]: # (- AX41-NVME @ 85.10.194.34)
 
 You should be able to log in with the following command:
 ```bash
