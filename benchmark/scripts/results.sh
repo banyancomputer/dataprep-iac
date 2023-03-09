@@ -12,9 +12,13 @@ if [ "$INSTANCE_PROVIDER" = "aws" ]; then
   mkdir -p results/aws
   scp -r -i "$EC2_PEM_PATH" "$TARGET_USER@$EC2_PUBLIC_DNS:$RESULT_PATH/*" results/aws
 elif [ "$INSTANCE_PROVIDER" = "hetzner" ]; then
-  echo "Copying results from Hetzner Instance @ user@85.10.194.34"
+  # Get the contents of the inventory file
+  INVENTORY=$(cat inventory/hetzner/host)
+  # Get the IP address from the first string
+  IP=$(echo $INVENTORY | cut -d' ' -f1)
+  echo "Copying results from Hetzner Instance @ user@$IP"
   mkdir -p results/hetzner
-  scp -r -i ~/.ssh/id_hetzner "user@85.10.194.34:$RESULT_PATH/*" results/hetzner
+  scp -r -i ~/.ssh/id_hetzner "user@$IP:$RESULT_PATH/*" results/hetzner
 elif [ "$INSTANCE_PROVIDER" = "local" ]; then
   echo "Copying results from local machine"
   mkdir -p results/local
