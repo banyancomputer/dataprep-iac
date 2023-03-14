@@ -1,0 +1,119 @@
+# Setup a Hetzner instance to setup a specified user
+# Allows to configure:
+# - username
+# - sudo access (with no password)
+# - ssh pub key
+# - whether to disable root login - default: yes
+# The specified user will be created if it does not exist
+# Its permissions will be updated if they are different
+# If a user is a sudoer, then it will be able to run any command without a password
+# The specified ssh pub key will be added to the user's authorized_keys
+# If the user already has a different ssh pub key, it will be removed
+# Must be run as sudoer
+
+- hosts: all
+  name: Setup a Hetzner instance with a specified user
+  tasks:
+    - name: Determine if the controlling user is root
+      set_fact:
+        is_root: "{{ ansible_user_id == 'root' }}"
+
+    # Create the user if it does not exist
+    - name: Generate a random password
+      set_fact:
+        # You really shouldn't need this for anything
+        user_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+    - name: Create the user
+      become: yes
+      user:
+        name: "{{ user_name }}"
+        password: "{{ user_password }}"
+        shell: /bin/bash
+        update_password: always
+        state: present
+    - name: Save the user's password to a file on the instance
+      become: yes
+      copy:
+        content: "{{ user_password }}"
+        dest: /home/{{ user_name }}/{{ user_name }}.password
+        mode: '0600'
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+
+    # Setup the user's ssh pub key
+    # Get the admin users ssh pub key
+    - name: Get the admin user's ssh pub key
+      become: yes
+      shell: "cat /home/{{ ansible_user_id }}/.ssh/authorized_keys"
+      register: admin_ssh_pub_key
+      when: not is_root
+    - name: Get the users ssh pub key from the control machine
+      set_fact:
+        user_ssh_pub_key: "{{ lookup('file', '{{ user_ssh_pub_key_path }}') }}"
+      when: user_ssh_pub_key_path is defined
+
+    - name: Add the admin's ssh pub key
+      become: yes
+      lineinfile:
+        path: /home/{{ user_name }}/.ssh/authorized_keys
+        line: "{{ admin_ssh_pub_key.stdout }}"
+        state: present
+        regexp: "^{{ admin_ssh_pub_key.stdout }}"
+      when: not is_root
+      ignore_errors: yes
+    - name: Add the user's ssh pub key
+      become: yes
+      lineinfile:
+        path: /home/{{ user_name }}/.ssh/authorized_keys
+        line: "{{ user_ssh_pub_key }}"
+        state: present
+        regexp: "^{{ user_ssh_pub_key }}"
+      when: user_ssh_pub_key is defined
+
+    # Make the user an admin if we are root
+    - name: Create an admin group if it does not exist
+      become: yes
+      group:
+        name: admin
+        state: present
+      when: is_root
+    - name: Make the user an admin
+      become: yes
+      user:
+        name: "{{ user_name }}"
+        groups: admin
+        append: yes
+        state: present
+      when: is_root
+
+    # Disable root login - lock the door behind us.
+    - name: Disable root login
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PermitRootLogin no"
+        state: present
+        regexp: "^PermitRootLogin"
+      when: is_root
+    - name: Disable password login
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PasswordAuthentication no"
+        state: present
+        regexp: "^PasswordAuthentication"
+      when: is_root
+    - name: Enable ssh key login
+      become: yes
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "PubkeyAuthentication yes"
+        state: present
+        regexp: "^PubkeyAuthentication"
+      when: is_root
+    - name: Restart sshd
+      become: yes
+      service:
+        name: sshd
+        state: restarted
+      when: is_root

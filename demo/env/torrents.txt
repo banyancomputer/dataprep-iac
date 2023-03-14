@@ -1,4 +1,296 @@
 # A file of magic links that arai2c can use to download files from the internet
-# Please document the source of each link and the file name it should be saved as
+# Please document the source of each magnet link
 
-magnet:?xt=urn:btih:bdcd92135f8718d4920801bd474638c4708f0995&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+# Reddit comments/submissions 2005-06 to 2022-12
+# https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+# 1.99 TiB
+# Citation:
+#@article{,
+#    title= {Reddit comments/submissions 2005-06 to 2022-12},
+#    journal= {},
+#    author= {stuck_in_the_matrix and Watchful1},
+#    year= {},
+#    url= {},
+#    abstract= {Reddit comments and submissions from 2005-06 to 2022-12 collected by pushshift which can be found here https://files.pushshift.io/reddit/
+#
+#    These are zstandard compressed ndjson files. Example python scripts for parsing the data can be found here https://github.com/Watchful1/PushshiftDumps},
+#    keywords= {reddit},
+#    terms= {},
+#    license= {},
+#    superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:7c0645c94321311bb05bd879ddee4d0eba08aaee&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# CAMELYON17
+# https://academictorrents.com/details/fa82a73b0903c5a75cf24bc68a980727bb1a807e
+# 2.48 TiB
+# Citation:
+# @article{,
+#title= {CAMELYON17},
+#keywords= {},
+#author= {},
+#abstract= {# CAMELYON17 Data Set
+### Overview
+#Built on the success of its predecessor, CAMELYON17 is the second grand challenge in pathology organised by the [Computational Pathology Group](http://www.diagnijmegen.nl/index.php/Digital_Pathology) of the Radboud University Medical Center (Radboudumc) in Nijmegen, The Netherlands.
+#
+#The goal of this challenge is to evaluate new and existing algorithms for automated detection and classification of breast cancer metastases in whole-slide images of histological lymph node sections. This task has high clinical relevance and would normally require extensive microscopic assessment by pathologists. The presence of metastases in lymph nodes has therapeutic implications for breast cancer patients. Therefore, an automated solution would hold great promise to reduce the workload of pathologists while at the same time reduce the subjectivity in diagnosis.
+#
+#For the complete description of the challenge and the data set please visit the [challenge](https://camelyon17.grand-challenge.org) website.
+#
+### Data
+#### Images
+#The data in this challenge contains a total of 1000 whole-slide images (WSIs) of sentinel lymph node from 5 different medical centers from The Netherlands: Radboud University Medical Center in Nijmegen, Canisius-Wilhelmina Hospital in Nijmegen, University Medical Center Utrecht, Rijnstate Hospital in Arnhem, and Laboratorium Pathologie Oost-Nederland in Hengelo.
+#
+#The data set is divided into training and testing sets with 20 patients from each center in both sets. For each patient the shared 5 whole-slide images are zipped together into a single ZIP file. The patient pN-stages and the slide-level labels in the training set are shared in the *stage_labels.csv* file.
+#
+#The slides are converted to generic [TIFF](https://www.awaresystems.be/imaging/tiff/bigtiff.html) (Tagged Image File Format) using an open-source file converter, part of the [ASAP](https://github.com/GeertLitjens/ASAP) package.
+#
+#https://i.imgur.com/nKB1Kqq.png
+#
+#### Annotations
+#From each center 10 slides are exhaustively annotated and the annotations are shared in XML format. The XML files are compatible with the [ASAP](https://github.com/GeertLitjens/ASAP) software. You may download this software and visualize the annotations overlaid on the whole slide image.
+#
+#The provided XML files may have two groups of annotations ("metastases", or "normal") which can be accessed from the "PartOfGroup" attribute of the Annotation node in the XML file. Annotations belonging to group "metastases" represent tumor areas and annotations within group "normal" are non-tumor areas which have been cut-out from the original annotations in the "metastases" group.
+#},
+#terms= {},
+#license= {https://creativecommons.org/publicdomain/zero/1.0/},
+#superseded= {},
+#url= {https://camelyon17.grand-challenge.org/}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:fa82a73b0903c5a75cf24bc68a980727bb1a807e&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# Subreddit comments/submissions 2005-06 to 2022-12
+# https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+# 1.66 TiB
+# Citation:
+# @article{,
+#title= {Subreddit comments/submissions 2005-06 to 2022-12},
+#journal= {},
+#author= {Watchful1},
+#year= {},
+#url= {https://www.reddit.com/r/pushshift/comments/11ef9if/separate_dump_files_for_the_top_20k_subreddits/},
+#abstract= {This is the top 20,000 subreddits from reddit's history in separate files. You can use your torrent client to only download the subreddit's you're interested in.
+#
+#These are from the pushshift dumps from 2005-06 to 2022-12 which can be found here https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+#
+#These are zstandard compressed ndjson files. Example python scripts for parsing the data can be found here https://github.com/Watchful1/PushshiftDumps},
+#keywords= {reddit},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:c398a571976c78d346c325bd75c47b82edf6124e&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# AVSpeech: Large-scale Audio-Visual Speech Dataset
+# https://academictorrents.com/details/b078815ca447a3e4d17e8a2a34f13183ec5dec41
+# 1.50 TiB
+# Citation:
+# @article{,
+#title= {AVSpeech: Large-scale Audio-Visual Speech Dataset },
+#journal= {},
+#author= {Ariel Ephrat and Inbar Mosseri and Oran Lang and Tali Dekel and Kevin Wilson and Avinatan Hassidim and William T. Freeman and Michael Rubinstein},
+#year= {},
+#url= {https://looking-to-listen.github.io/avspeech/},
+#abstract= {AVSpeech is a new, large-scale audio-visual dataset comprising speech video clips with no interfering background noises. The segments are 3-10 seconds long, and in each clip the audible sound in the soundtrack belongs to a single speaking person, visible in the video. In total, the dataset contains roughly 4700 hours* of video segments, from a total of 290k YouTube videos, spanning a wide variety of people, languages and face poses. For more details on how we created the dataset see our paper, Looking to Listen at the Cocktail Party: A Speaker-Independent Audio-Visual Model for Speech Separation (https://arxiv.org/abs/1804.03619).
+#
+#* UPLOADER'S NOTE: This dataset contains 3000 hours of video segments and not the entire 4700 hours. 1700 hours were not included as some no longer existed on youtube, had a copyright violation, not available in the United States, or was of poor quality. Over 1 million segments are included in this torrent, each between 3 - 10 seconds, and in 720p resolution. See README on how to use this dataset},
+#keywords= {speech isolation, lip reading, face detection},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:b078815ca447a3e4d17e8a2a34f13183ec5dec41&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# gaia_dr3_mvl_v1
+# https://academictorrents.com/details/300605cbbcf8fe47851dd68902b40e825f915bcb
+# 1.47 TiB
+# Citation:
+# @article{,
+#title= {gaia_dr3_mvl_v1},
+#journal= {},
+#author= {Vladimir Dergachev},
+#year= {},
+#url= {https://www.atlas.aei.uni-hannover.de/work/volodya/Gaia_dr3/},
+#abstract= {Gaia DR3 data in MVL format. The MVL stands for Mappable Vector Library and is a file format designed for memory mapping. With a solid state drive, you can map the entire Gaia data into memory and access it at will - even on a small notebook. You can also run parallel computations because the data will be shared between processes running on the same computer.
+#
+#You can find more information and examples at:
+#https://www.atlas.aei.uni-hannover.de/work/volodya/Gaia_dr3/},
+#keywords= {Gaia, MVL, astronomy},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:300605cbbcf8fe47851dd68902b40e825f915bcb&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# MLDS-DS3-10000-v1.0
+# https://academictorrents.com/details/b2bbaccd349e8e2954a438ced6fc01adae4ea1f1
+# 1.35 TiB
+# Citation:
+#@article{,
+#title= {MLDS-DS3-10000-v1.0},
+#journal= {},
+#author= {Clemens, John M.},
+#year= {},
+#url= {https://www.mlcathome.org/mlds.html},
+#abstract= {Machine Learning Dataset, DS3-10000 v1.0: A dataset for parameter-space analysis of neural networks. See https://www.mlcathome.org/ for more information},
+#keywords= {dataset, neural, network, ml},
+#terms= {},
+#license= {CC-BY-SA 4.0},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:b2bbaccd349e8e2954a438ced6fc01adae4ea1f1&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# LAION-400-MILLION OPEN DATASET
+# https://academictorrents.com/details/34b94abbcefef5a240358b9acd7920c8b675aacc
+# 1.21 TiB
+# Citation:
+# @article{,
+#title= {LAION-400-MILLION OPEN DATASET},
+#journal= {},
+#author= {},
+#year= {},
+#url= {https://laion.ai/laion-400-open-dataset/},
+#abstract= {LAION-400M
+#
+#The world’s largest openly available image-text-pair dataset with 400 million samples.
+#
+## Concept and Content
+#The LAION-400M dataset is completely openly, freely accessible.
+#
+#All images and texts in the LAION-400M dataset have been filtered with OpenAI‘s CLIP by calculating the cosine similarity between the text and image embeddings and dropping those with a similarity below 0.3 The threshold of 0.3 had been determined through human evaluations and seems to be a good heuristic for estimating semantic image-text-content matching.
+#The image-text-pairs have been extracted from the Common Crawl web data dump and are from random web pages crawled between 2014 and 2021.
+#
+## Download Information
+#You can find
+#
+#The CLIP image embeddings (NumPy files)
+#
+#The parquet files
+#
+#KNN index of image embeddings
+#
+## LAION-400M Dataset Statistics
+#The LAION-400M and future even bigger ones are in fact datasets of datasets. For instance, it can be filtered out by image sizes into smaller datasets like this:
+#```
+#Number of unique samples 413M
+#Number with height or width >= 1024 26M
+#Number with height and width >= 1024 9.6M
+#Number with height or width >= 512 112M
+#Number with height and width >= 512 67M
+#Number with height or width >= 256 268M
+#Number with height and width >= 256 211M
+#```
+#By using the KNN index specialized datasets can also be extracted by domains of interest. They are (or will be) sufficient in size to train domain specialized models.
+#
+## Disclaimer & Content Warning
+#Our filtering protocol only removed NSFW images that were detected as illegal but the dataset still has NSFW content accordingly marked in the metadata. Please use the demo links with caution. You can extract a “safe” subset by filtering out samples marked with NSFW or via stricter CLIP filtering.
+#
+#
+#There is a certain degree of duplication because we used URL+text as deduplication criteria. The same image with the same caption may sit at different URLs causing duplicates. The same image with different captions is not, however, considered duplicated.
+#
+#Using KNN clustering should make it easy to further deduplicate by image content.
+#
+## License
+#
+#We are distributing the metadata dataset (the parquet files) under the most open creative common CC-BY 4.0 license. It poses no particular restriction. The images are under their own copyright.},
+#keywords= {},
+#terms= {},
+#license= {https://creativecommons.org/licenses/by/4.0/},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:34b94abbcefef5a240358b9acd7920c8b675aacc&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+#  ImageNet21K (Winter 2021 Release)
+# https://academictorrents.com/details/8ec0d8df0fbb507594557bce993920442f4f6477
+# 1.19 TiB
+# Citation:
+# @article{,
+#title= {ImageNet21K (Winter 2021 Release)},
+#journal= {},
+#author= {Jia Deng and Wei Dong and Richard Socher and Li-Jia Li and Kai Li and Li Fei-Fei},
+#year= {},
+#url= {https://www.image-net.org/},
+#abstract= {ImageNet is an image dataset organized according to the WordNet hierarchy. Each meaningful concept in WordNet, possibly described by multiple words or word phrases, is called a "synonym set" or "synset". There are more than 100,000 synsets in WordNet, majority of them are nouns (80,000+). In ImageNet, we aim to provide on average 1000 images to illustrate each synset. Images of each concept are quality-controlled and human-annotated. In its completion, we hope ImageNet will offer tens of millions of cleanly sorted images for most of the concepts in the WordNet hierarchy.
+#
+#},
+#keywords= {imagenet},
+#terms= {You have been granted access for non-commercial research/educational use. By accessing the data, you have agreed to the following terms.
+#
+#You (the "Researcher") have requested permission to use the ImageNet database (the "Database") at Princeton University and Stanford University. In exchange for such permission, Researcher hereby agrees to the following terms and conditions:
+#
+#1. Researcher shall use the Database only for non-commercial research and educational purposes.
+#2. Princeton University and Stanford University make no representations or warranties regarding the Database, including but not limited to warranties of non-infringement or fitness for a particular purpose.
+#3. Researcher accepts full responsibility for his or her use of the Database and shall defend and indemnify Princeton University and Stanford University, including their employees, Trustees, officers and agents, against any and all claims arising from Researcher's use of the Database, including but not limited to Researcher's use of any copies of copyrighted images that he or she may create from the Database.
+#4. Researcher may provide research associates and colleagues with access to the Database provided that they first agree to be bound by these terms and conditions.
+#5. Princeton University and Stanford University reserve the right to terminate Researcher's access to the Database at any time.
+#6. If Researcher is employed by a for-profit, commercial entity, Researcher's employer shall also be bound by these terms and conditions, and Researcher hereby represents that he or she is fully authorized to enter into this agreement on behalf of such employer.
+#7. The law of the State of New Jersey shall apply to all disputes under this agreement.},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:8ec0d8df0fbb507594557bce993920442f4f6477&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# EPIC-KITCHENS 2018
+# https://academictorrents.com/details/d08f4591d1865bbe3436d1eb25ed55aae8b8f043
+# 1.15 TiB
+# Citation:
+# @article{,
+#title= {EPIC-KITCHENS 2018},
+#journal= {},
+#author= {Damen, Dima and Doughty, Hazel and Farinella, Giovanni Maria and Fidler, Sanja and Furnari, Antonino and Kazakos, Evangelos and Moltisanti, Davide and Munro, Jonathan and Perrett, Toby and Price, Will and Wray, Michael},
+#year= {},
+#url= {http://epic-kitchens.github.io},
+#abstract= {The largest dataset in egocentric vision to-date. Full details on: http://epic-kitchens.github.io},
+#keywords= {},
+#terms= {},
+#license= {Non-Commercial Government License for public sector information},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:d08f4591d1865bbe3436d1eb25ed55aae8b8f043&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# PADCHEST_SJ (Feb 2019 Update)
+# https://academictorrents.com/details/dec12db21d57e158f78621f06dcbe78248d14850
+# 1.13 TiB
+# Citation:
+# @article{,
+#title= {PADCHEST_SJ (Feb 2019 Update)},
+#keywords= {chest xray, radiology},
+#author= {},
+#abstract= {This dataset includes more than 160,000 images obtained from 67,000 patients that were interpreted and reported by radiologists at Hospital San Juan Hospital (Spain) from 2009 to 2017, covering six different position views and additional information on image acquisition and patient demography. The reports were labeled with 174 different radiographic findings, 19 differential diagnoses and 104 anatomic locations organized as a hierarchical taxonomy and mapped onto standard Unified Medical Language System (UMLS) terminology.
+#
+#https://i.imgur.com/MpVlYgB.png},
+#terms= {},
+#license= {Creative Commons Attribution-ShareAlike 4.0 International License},
+#superseded= {},
+#url= {https://arxiv.org/abs/1901.07441}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:dec12db21d57e158f78621f06dcbe78248d14850&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# FMA: A Dataset For Music Analysis
+# https://academictorrents.com/details/dba20c45d4d6fa6453a4e99d2f8a4817893cfb94
+# 1.08 TiB
+# Citation:
+# @article{,
+#title= {FMA: A Dataset For Music Analysis},
+#journal= {},
+#author= {Defferrard, Michael and Benzi, Kirell and Vandergheynst, Pierre and Bresson, Xavier},
+#year= {2017},
+#url= {https://github.com/mdeff/fma},
+#abstract= {We introduce the Free Music Archive (FMA), an open and easily accessible dataset suitable for evaluating several tasks in MIR, a field concerned with browsing, searching, and organizing large music collections. The community's growing interest in feature and end-to-end learning is however restrained by the limited availability of large audio datasets. The FMA aims to overcome this hurdle by providing 917 GiB and 343 days of Creative Commons-licensed audio from 106,574 tracks from 16,341 artists and 14,854 albums, arranged in a hierarchical taxonomy of 161 genres. It provides full-length and high-quality audio, pre-computed features, together with track- and user-level metadata, tags, and free-form text such as biographies. We here describe the dataset and how it was created, propose a train/validation/test split and three subsets, discuss some suitable MIR tasks, and evaluate some baselines for genre recognition. Code, data, and usage examples are available at https://github.com/mdeff/fma.},
+#keywords= {Music Sound},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:dba20c45d4d6fa6453a4e99d2f8a4817893cfb94&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce

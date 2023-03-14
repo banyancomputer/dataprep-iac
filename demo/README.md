@@ -6,7 +6,6 @@ Directory for coordinating the demo of the `dataprep` tool.
 - Python
 - Ansible
 
-
 # Demo Overview
 - Setting up the instance
 - Setting up the environment and installing dependencies
@@ -14,17 +13,83 @@ Directory for coordinating the demo of the `dataprep` tool.
 - Running the demo
 - Opening up NFS server on generated output
 
-## Setting up IFTTT
-NOTE (amiller68): When I last tested this, my key did not work at all! Something may have changed with IFTTT.
+## Setting up the instance
 
-You can configure `env/env.ifttt` to send you notifications when the benchmark is complete or as it progresses.
-You will need to create an IFTTT account and configure a webhook to send notifications to your phone:
-- Create an IFTTT account
-- Create a new applet
-  - Select "Webhooks" as the trigger. Use the "Receive a web request with a JSON payload" trigger. Call this trigger "benchmark-notification"
-  - Select "Notifications" as the action. Use the "Send a rich notification from the IFTTT app" action.
-- Configure the webhook
-  - Go to https://ifttt.com/services/maker_webhooks/settings
-  - Copy the key from the URL at the bottom of the page. 
-  - Configure `env/env.ifttt` s.t. `IFTTT_TEST_WEBHOOK_KEY=<your key>`
-- Download the IFTTT app on your phone
+## Fresh Setup
+This repository assumes you have already installed an image of Ubuntu 22.04 on a Hetzner SX134 instance.
+You should have root access to the instance without a password through an SSH key.
+We assume 120 TiB of storage is available on the instance.
+
+Our instance is already setup with necessary dependencies.
+Should you need to set up the instance you can run:
+
+```bash
+# Create an admin user
+./scripts/user.sh admin <path_to_public_key>
+```
+```bash
+# Set up the instance
+./scripts/setup.sh
+```
+
+### Connecting to the instance
+We currently have the following Hetzner hosts setup:
+- SX134 @ 65.108.139.172
+
+The server is set up with:
+- Ubuntu 22.04
+- ~120 TiB of storage
+- An admin user called `admin` with passwordless sudo access
+
+Configure your user, home dir, and host in `env/env.user`
+
+Adminstrators can log in to the server using the SSH key provided in our secrets repository:
+- save the key to `~/.ssh/id_hetzner`
+- run `ssh -i ~/.ssh/id_hetzner admin@65.108.139.172`
+
+Adminstrators can set up non-sudo users with SSH keys as well:
+- save the public key of the desired user to a file on your control machine
+- run `./scripts/user.sh <user> <file_path>` to set up the user
+
+The user will be able to run non-privileged commands and playbooks using their ssh key. This user will also be accessible via ssh using the admin user's key.
+
+### Installing Dataprep 
+Even as a non-admin user, you can install the `dataprep` tool on the instance.
+After appropriately configuring and moving `env/env.user` and `env/env.git` , you can do this with the following commands:
+```bash
+# Set up the instance
+./scripts/install.sh
+```
+
+### Pulling datasets
+You can configure the datasets you want to pull from the torrent tracker in `env/torrents.txt`.
+Our are all sourced from Academic Torrents.
+
+You can start pulling the datasets with the following command:
+```bash
+# Pull datasets
+./scripts/torrent.sh
+```
+
+You can check the status of the torrents with the following command:
+```bash
+# ssh into the instance
+ssh -i ~/.ssh/id_hetzner <user>@65.108.139.172
+# Check the status of the torrents
+tmux a
+```
+You can detach from the session you start with `tmux a` with `Ctrl + b` and then `d`.
+
+### Running the demo
+You can run the demo with the following command:
+```bash
+# Run the demo
+./scripts/run.sh
+```
+
+This should pack the datasets into a flat, encrypted, and compressed format and by running the `dataprep` tool on them.
+The output of the demo will be stored in the `packed` directory.
+A manifest of the output will be stored in `manifest.json`.
+
+### Opening up NFS server on generated output
+TODO
