@@ -23,4 +23,4 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$ADMIN_USER" \
   -e "user_name=$USER" \
   -e "user_ssh_pub_key_path=$USER_SSH_PUB_KEY_PATH" \
-  ./ansible/utils/user.yml
+  ./ansible/admin/user.yml

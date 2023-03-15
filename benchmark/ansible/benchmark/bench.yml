@@ -91,7 +91,6 @@
   time {{ time_verbose_flag }} \
     dataprep \ 
       unpack \
-        -i {{ packed_path }} \
         -o {{ unpacked_path }} \ 
         -m {{ manifest_path }}/{{ input_file_name.stdout }}.json;
   "

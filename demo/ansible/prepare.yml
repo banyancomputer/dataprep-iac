@@ -1,0 +1,20 @@
+- hosts: all
+  name: Run our benchmarks
+  tasks:
+    - name: Make sure the packed path exists
+      file:
+        path: "{{ packed_path }}"
+        state: directory
+    - name: Check if the packed path is empty
+      shell: "ls -A {{ packed_path }}"
+      register: packed_path_contents
+      ignore_errors: yes
+    - name: If the packed path is empty, fail
+      fail:
+        msg: "The packed path is empty. Please run the run.yml playbook before running this playbook."
+      when: packed_path_contents.stdout == ""
+    - name: Process the files of the packed directory in a new tmux session
+      shell: "md5sum * | tr -s ' ' | tr ' ' ',' > {{ export_path }}/packed.csv"
+      args:
+        chdir: "{{ packed_path }}"
+      ignore_errors: yes

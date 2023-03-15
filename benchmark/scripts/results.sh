@@ -17,8 +17,8 @@ elif [ "$INSTANCE_PROVIDER" = "hetzner" ]; then
   # Get the IP address from the first string
   IP=$(echo $INVENTORY | cut -d' ' -f1)
   echo "Copying results from Hetzner Instance @ user@$IP"
-  mkdir -p results/hetzner
-  scp -r -i ~/.ssh/id_hetzner "user@$IP:$RESULT_PATH/*" results/hetzner
+  mkdir -p results/hetzner/$IP
+  scp -r -i ~/.ssh/id_hetzner "user@$IP:$RESULT_PATH/*" results/hetzner/$IP
 elif [ "$INSTANCE_PROVIDER" = "local" ]; then
   echo "Copying results from local machine"
   mkdir -p results/local

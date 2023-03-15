@@ -1,0 +1,80 @@
+# Setup a Hetzner instance to setup a specified user that is specifically a reader of packed data
+# Allows to configure:
+# - username
+# - host address
+
+- hosts: all
+  name: Setup a Hetzner instance with a specified reader
+  tasks:
+    # Make the user an admin if we are root
+    - name: Create an reader group if it does not exist
+      become: yes
+      group:
+        name: reader
+        state: present
+    # Create the user if it does not exist
+    - name: Generate a random password
+      set_fact:
+        # You really shouldn't need this for anything
+        user_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+    - name: Create the user
+      become: yes
+      user:
+        name: "{{ reader_name }}"
+        password: "{{ user_password }}"
+        shell: /bin/bash
+        update_password: always
+        state: present
+    - name: Save the user's password to a file on the instance
+      become: yes
+      copy:
+        content: "{{ user_password }}"
+        dest: /home/{{ reader_name }}/{{ reader_name }}.password
+        mode: '0600'
+        owner: "{{ reader_name }}"
+        group: "reader"
+
+    # Readers shouldn't require ssh access, so don't bother setting up ssh keys
+    # Do allow them to read the data they need to read
+    # Add the user's hostname to the /etc/hosts.readers file
+    - name: Get the user's uid
+      become: yes
+      shell: "id -u {{ reader_name }}"
+      register: user_uid
+    - name: Get the user's gid
+      become: yes
+      shell: "id -g {{ reader_name }}"
+      register: user_gid
+    - name: Add the user's hostname to the /etc/hosts.readers file
+      become: yes
+      lineinfile:
+        path: /etc/hosts.readers
+        # Just add the hostname or IP address. Handle removing the IP address in the future
+        line: "{{ reader_hostname }}"
+        state: present
+      ignore_errors: yes
+    - name: Set a string describing the readers permissions
+      set_fact:
+        reader_host_permissions: "{{ reader_hostname }}(ro,all_squash,anonuid={{ user_uid.stdout }},anongid={{ user_gid.stdout }})"
+    - name: Create an /exported directory for the reader, from which they can read everything
+      become: yes
+      file:
+        path: "/exported/{{ reader_name }}"
+        state: directory
+        owner: "{{ reader_name }}"
+        group: "reader"
+        mode: '0770'
+    - name: Add the user to /etc/exports
+      become: yes
+      lineinfile:
+        path: /etc/exports
+        backrefs: yes
+        regexp: "^(.*/home/exports.*)$"
+        line: '\1 {{ reader_host_permissions }}'
+        state: present
+      ignore_errors: yes
+    - name: Run exportfs
+      become: yes
+      shell: "exportfs -a"
+      ignore_errors: yes
+

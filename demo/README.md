@@ -15,7 +15,7 @@ Directory for coordinating the demo of the `dataprep` tool.
 
 ## Setting up the instance
 
-## Fresh Setup
+### Fresh Setup
 This repository assumes you have already installed an image of Ubuntu 22.04 on a Hetzner SX134 instance.
 You should have root access to the instance without a password through an SSH key.
 We assume 120 TiB of storage is available on the instance.
@@ -38,7 +38,6 @@ We currently have the following Hetzner hosts setup:
 
 The server is set up with:
 - Ubuntu 22.04
-- ~120 TiB of storage
 - An admin user called `admin` with passwordless sudo access
 
 Configure your user, home dir, and host in `env/env.user`
@@ -52,6 +51,7 @@ Adminstrators can set up non-sudo users with SSH keys as well:
 - run `./scripts/user.sh <user> <file_path>` to set up the user
 
 The user will be able to run non-privileged commands and playbooks using their ssh key. This user will also be accessible via ssh using the admin user's key.
+The user will be able to run all necessary commands to run the demo (unless otherwise specified).
 
 ### Installing Dataprep 
 Even as a non-admin user, you can install the `dataprep` tool on the instance.
@@ -71,6 +71,8 @@ You can start pulling the datasets with the following command:
 ./scripts/torrent.sh
 ```
 
+We have already specified ~10 TiBs worth or datasets to pull in `env/torrents.txt`.
+
 You can check the status of the torrents with the following command:
 ```bash
 # ssh into the instance
@@ -80,16 +82,59 @@ tmux a
 ```
 You can detach from the session you start with `tmux a` with `Ctrl + b` and then `d`.
 
-### Running the demo
-You can run the demo with the following command:
+## Running the demo
+
+### Packing the datasets
+
+You can start to run the demo with your specified with the following command:
 ```bash
 # Run the demo
 ./scripts/run.sh
 ```
 
-This should pack the datasets into a flat, encrypted, and compressed format and by running the `dataprep` tool on them.
-The output of the demo will be stored in the `packed` directory.
-A manifest of the output will be stored in `manifest.json`.
+This will pack your datasets into a flat, encrypted, and compressed format and by running the `dataprep` tool on them.
+The packed files will appear in `/home/exports/$USER/packed`.
 
-### Opening up NFS server on generated output
-TODO
+A manifest of the output will be stored in `manifest.json` in your home directory.
+This allows you to recover the original files from the packed files. Do not delete this file.
+
+You can check the status of the packing with the following command:
+```bash
+# ssh into the instance
+ssh -i ~/.ssh/id_hetzner <user>@...
+# Check the status of the packing
+tmux a
+```
+
+### Preparing for onboarding
+
+Your onboarder will need to be a reader on the instance.
+An admin add them as one with the following command:
+
+```bash
+# Add onboarder as a reader
+./scripts/reader.sh <onboarder_name> <onboarder_ip_or_hostname>
+```
+
+This will give them read access to the NFS server on the instance under a named user and from a specific IP address or hostname.
+The server exports the directory `/home/exports` to the onboarder, from which they can access your packed datasets.
+
+Your onboard might require a list of files and checksums to verify the integrity of the data.
+You can generate this with the following command:
+```bash
+# Generate a csv describing the packed datasets
+./scripts/prepare.sh
+```
+
+This will generate a csv file in the `/home/exports/$USER` directory called `packed.csv`.
+This file contains the following (unnamed) columns:
+- `checksum`: the checksum of the file (md5)
+- `file`: the name of the file
+
+Your onboarder will be able to access this file at `/home/exports/$USER/packed.csv`.
+
+### Onboarding
+
+Once you are sure your dataset is ready to be onboarded, contact an admin and your onboarder.
+The admin will start the NFS server on the instance and give your onboarder access to the packed datasets.
+The onboarder can then pull your packed datsets and onboard them to Filecoin.

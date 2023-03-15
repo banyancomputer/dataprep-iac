@@ -5,6 +5,14 @@
       file:
         path: "{{ packed_path }}"
         state: directory
+    - name: Check if the packed path is empty
+      shell: "ls -A {{ packed_path }}"
+      register: packed_path_contents
+      ignore_errors: yes
+    - name: If the packed path is not empty, fail
+      fail:
+        msg: "The packed path is not empty. Please delete the contents of the packed path before running this playbook."
+      when: packed_path_contents.stdout != ""
     - name: Make sure manifest.json does not exist
       file:
         path: "manifest.json"
@@ -16,11 +24,3 @@
     - name: Wait for dataprep to finish packing the dataset
       shell: "tmux wait -t dataprep"
       ignore_errors: yes
-    - include_tasks: ../utils/ifttt.yml
-      vars:
-        ifttt_job: "benchmark-notification"
-        ifttt_body: "{
-          \"Title\": \"Demo is packed up!\",
-        }"
-        ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
-      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
