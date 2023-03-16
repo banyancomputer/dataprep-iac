@@ -32,14 +32,28 @@
         update: yes
     # For now, just wipe target and install the binary
     - name: Wipe target
-      shell: cargo +nightly clean
+      shell: cargo clean
       args:
         chdir: "dataprep"
       environment:
         PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
     - name: Install the Dataprep binary
-      shell: cargo +nightly install --path dataprep
+      # TODO: Something is broken with nightly rust -- so just don't install the binary for now
+      #      shell: cargo install --path dataprep
+      shell: sleep 5
       args:
         chdir: "dataprep"
       environment:
         PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    # Copy our TMUX jobs to the user and make them executable
+    - name: Copy our torrent jobs to the user
+      copy:
+        src: "utils/torrent_job.sh"
+        dest: "{{ root_path }}/torrent_job.sh"
+        mode: '0755'
+    - name: Copy our dataprep jobs to the use
+      copy:
+        src: "utils/dataprep_job.sh"
+        dest: "{{ root_path }}/dataprep_job.sh"
+        mode: '0755'

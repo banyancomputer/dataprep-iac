@@ -17,7 +17,6 @@ if [ "$USER" = "admin" ]; then
 else
   export ADMIN_USER=admin
 fi
-echo cat "$USER_SSH_PUB_KEY_PATH"
 # Create the user with the specified ssh-pub-key, name, and admin status
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$ADMIN_USER" \

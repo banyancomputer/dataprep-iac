@@ -14,7 +14,13 @@
         msg: "The packed path is empty. Please run the run.yml playbook before running this playbook."
       when: packed_path_contents.stdout == ""
     - name: Process the files of the packed directory in a new tmux session
-      shell: "md5sum * | tr -s ' ' | tr ' ' ',' > {{ export_path }}/packed.csv"
-      args:
-        chdir: "{{ packed_path }}"
-      ignore_errors: yes
+      shell: "./prepare_job.sh {{ export_path }} {{ packed_path }} {{ ifttt_test_webhook_key }}"
+    - debug:
+        msg: "
+          Waiting for the prepare job to finish.
+          Feel free to exit this playbook. 
+          If you've set up IFTTT, you'll get a notification when the torrent is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+    - name: Wait for the prepare job to finish
+      shell: "tmux wait prepare"

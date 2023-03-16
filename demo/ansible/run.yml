@@ -1,5 +1,5 @@
 - hosts: all
-  name: Run our benchmarks
+  name: Run our demo
   tasks:
     - name: Make sure the packed path exists
       file:
@@ -18,9 +18,16 @@
         path: "manifest.json"
         state: absent
     - name: Pack the dataset with dataprep in a new tmux session
-      shell: "tmux new -d dataprep pack -i {{ dataset_path }} -o {{ packed_path }} -m manifest.json; tmux wait -S dataprep"
+      shell: "./dataprep_job.sh {{ dataset_path }} {{ packed_path }} {{ ifttt_test_webhook_key }}"
       environment:
         PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+    - debug:
+        msg: "
+          Waiting for dataprep to finish packing the dataset.
+          Feel free to exit this playbook. 
+          If you've set up IFTTT, you'll get a notification when the packing is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
     - name: Wait for dataprep to finish packing the dataset
-      shell: "tmux wait -t dataprep"
+      shell: "tmux wait dataprep"
       ignore_errors: yes

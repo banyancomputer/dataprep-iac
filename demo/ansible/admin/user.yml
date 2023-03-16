@@ -93,7 +93,8 @@
         state: directory
         owner: "{{ user_name }}"
         group: "{{ user_name }}"
-        # User can read and write, parent groups have their own permissions
+        # User can write, but no one else can
+        mode: '0755'
       when: not is_root
 
     # Make the user an admin if we are root

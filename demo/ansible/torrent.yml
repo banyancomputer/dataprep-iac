@@ -1,5 +1,5 @@
 - hosts: all
-  name: Start aria2c on torrent files
+  name: Start aria2c on torrenting files
   tasks:
     - name: Make sure the dataset path exists
       file:
@@ -9,19 +9,14 @@
       copy:
         src: "../env/torrents.txt"
         dest: "{{ dataset_path }}/torrents.txt"
-    - name: Start aria2c on the host in a tmux session
-      shell: "tmux new -d aria2c --seed-time=0 -Z -i torrents.txt; tmux wait -S aria2c"
-      args:
-        chdir: "{{ dataset_path }}"
+    - name: Start aria2c on the host in a tmux session. Alert and signal when done
+      shell: "./torrent_job.sh {{ dataset_path }} {{ ifttt_test_webhook_key }}"
+    - debug:
+        msg: "
+          Waiting for the torrent to finish downloading.
+          Feel free to exit this playbook. 
+          If you've set up IFTTT, you'll get a notification when the torrent is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
     - name: Wait for the torrent to finish downloading
-      shell: "tmux wait -S aria2c"
-    # Send a notification to IFTTT that we're done
-    - include_tasks: ../utils/ifttt.yml
-      vars:
-        ifttt_job: "benchmark-notification"
-        ifttt_body: "{
-          \"Title\": \"Torrent done\",
-        }"
-        # Note: These need to be named differently than the variables in the playbook
-        ifttt_webhook_key: "{{ ifttt_test_webhook_key }}"
-      when: ifttt_test_webhook_key is defined and ifttt_test_webhook_key != ""
+      shell: "tmux wait aria2"

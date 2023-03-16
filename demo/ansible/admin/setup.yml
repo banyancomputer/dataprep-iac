@@ -23,7 +23,6 @@
         - tmux
         - nfs-kernel-server
         - nfs-common
-        - md5sum
 
     # Make sure the /etc/hosts.readers file exists.
     # This will be populated with the IP addresses of the machines that are allowed to read from the NFS share
@@ -66,6 +65,6 @@
       file:
         path: /home/exports
         state: directory
-        owner: root
-        group: root
-        mode: '0770'
+        owner: admin
+        group: admin
+        mode: '0777'
