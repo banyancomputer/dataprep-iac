@@ -57,3 +57,13 @@
         src: "utils/dataprep_job.sh"
         dest: "{{ root_path }}/dataprep_job.sh"
         mode: '0755'
+    - name: Copy our prepare job to the use
+      copy:
+        src: "utils/prepare_job.sh"
+        dest: "{{ root_path }}/prepare_job.sh"
+        mode: '0755'
+    - name: Copy our unpack jobs to the use
+      copy:
+        src: "utils/unpack_job.sh"
+        dest: "{{ root_path }}/unpack_job.sh"
+        mode: '0755'
