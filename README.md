@@ -14,3 +14,4 @@ See the [README](benchmark/README.md) for more information.
 
 Used to configure, generate data for, and run a demo of the `dataprep` tool.
 Designed to target a Hetzner SX134 instance.
+See the [README](demo/README.md) for more information.

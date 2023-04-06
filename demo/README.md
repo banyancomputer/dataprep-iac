@@ -134,6 +134,9 @@ This file contains the following (unnamed) columns:
 - `checksum`: the checksum of the file (md5)
 - `file`: the name of the file
 
+You might have to fiddle with the adjusted ulimit specified in `ansible/utils/prepare_job.sh` to get the prep job to run.
+This is because the number of files in the packed dataset is too large for the default ulimit.
+
 ### Onboarding
 
 Once you are sure your dataset is ready to be onboarded, contact an admin and your onboarder.

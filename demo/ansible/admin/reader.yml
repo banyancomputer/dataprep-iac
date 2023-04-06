@@ -25,6 +25,10 @@
         shell: /bin/bash
         update_password: always
         state: present
+        groups: reader
+    - name: Make reader the user's primary group
+      become: yes
+      shell: "usermod -g reader {{ reader_name }}"
     - name: Save the user's password to a file on the instance
       become: yes
       copy:
@@ -56,14 +60,6 @@
     - name: Set a string describing the readers permissions
       set_fact:
         reader_host_permissions: "{{ reader_hostname }}(ro,all_squash,anonuid={{ user_uid.stdout }},anongid={{ user_gid.stdout }})"
-    - name: Create an /exported directory for the reader, from which they can read everything
-      become: yes
-      file:
-        path: "/exported/{{ reader_name }}"
-        state: directory
-        owner: "{{ reader_name }}"
-        group: "reader"
-        mode: '0770'
     - name: Add the user to /etc/exports
       become: yes
       lineinfile:
