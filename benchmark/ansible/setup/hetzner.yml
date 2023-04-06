@@ -23,7 +23,6 @@
       with_items:
         - gcc
         - git
-        - sshfs
     # Download and install Rustup
     - name: Download Rustup Installer
       get_url:

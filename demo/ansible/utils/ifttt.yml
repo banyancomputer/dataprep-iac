@@ -1,0 +1,9 @@
+- name: Send a notification to IFTTT that we've completed a task
+  uri:
+    url: "https://maker.ifttt.com/trigger/{{ ifttt_job }}/json/with/key/{{ ifttt_webhook_key }}"
+    method: POST
+    body: "{{ ifttt_body }}"
+    body_format: json
+    status_code: 200
+  register: ifttt_response
+  when: ifttt_webhook_key is defined and ifttt_webhook_key != ""

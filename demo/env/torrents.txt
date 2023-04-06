@@ -1,0 +1,127 @@
+# A file of magic links that arai2c can use to download files from the internet
+# Please document the source of each magnet link
+
+# Reddit comments/submissions 2005-06 to 2022-12
+# https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+# 1.99 TiB
+# Citation:
+#@article{,
+#    title= {Reddit comments/submissions 2005-06 to 2022-12},
+#    journal= {},
+#    author= {stuck_in_the_matrix and Watchful1},
+#    year= {},
+#    url= {},
+#    abstract= {Reddit comments and submissions from 2005-06 to 2022-12 collected by pushshift which can be found here https://files.pushshift.io/reddit/
+#
+#    These are zstandard compressed ndjson files. Example python scripts for parsing the data can be found here https://github.com/Watchful1/PushshiftDumps},
+#    keywords= {reddit},
+#    terms= {},
+#    license= {},
+#    superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:7c0645c94321311bb05bd879ddee4d0eba08aaee&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# Subreddit comments/submissions 2005-06 to 2022-12
+# https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+# 1.66 TiB
+# Citation:
+# @article{,
+#title= {Subreddit comments/submissions 2005-06 to 2022-12},
+#journal= {},
+#author= {Watchful1},
+#year= {},
+#url= {https://www.reddit.com/r/pushshift/comments/11ef9if/separate_dump_files_for_the_top_20k_subreddits/},
+#abstract= {This is the top 20,000 subreddits from reddit's history in separate files. You can use your torrent client to only download the subreddit's you're interested in.
+#
+#These are from the pushshift dumps from 2005-06 to 2022-12 which can be found here https://academictorrents.com/details/7c0645c94321311bb05bd879ddee4d0eba08aaee
+#
+#These are zstandard compressed ndjson files. Example python scripts for parsing the data can be found here https://github.com/Watchful1/PushshiftDumps},
+#keywords= {reddit},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:c398a571976c78d346c325bd75c47b82edf6124e&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# AVSpeech: Large-scale Audio-Visual Speech Dataset
+# https://academictorrents.com/details/b078815ca447a3e4d17e8a2a34f13183ec5dec41
+# 1.50 TiB
+# Citation:
+# @article{,
+#title= {AVSpeech: Large-scale Audio-Visual Speech Dataset },
+#journal= {},
+#author= {Ariel Ephrat and Inbar Mosseri and Oran Lang and Tali Dekel and Kevin Wilson and Avinatan Hassidim and William T. Freeman and Michael Rubinstein},
+#year= {},
+#url= {https://looking-to-listen.github.io/avspeech/},
+#abstract= {AVSpeech is a new, large-scale audio-visual dataset comprising speech video clips with no interfering background noises. The segments are 3-10 seconds long, and in each clip the audible sound in the soundtrack belongs to a single speaking person, visible in the video. In total, the dataset contains roughly 4700 hours* of video segments, from a total of 290k YouTube videos, spanning a wide variety of people, languages and face poses. For more details on how we created the dataset see our paper, Looking to Listen at the Cocktail Party: A Speaker-Independent Audio-Visual Model for Speech Separation (https://arxiv.org/abs/1804.03619).
+#
+#* UPLOADER'S NOTE: This dataset contains 3000 hours of video segments and not the entire 4700 hours. 1700 hours were not included as some no longer existed on youtube, had a copyright violation, not available in the United States, or was of poor quality. Over 1 million segments are included in this torrent, each between 3 - 10 seconds, and in 720p resolution. See README on how to use this dataset},
+#keywords= {speech isolation, lip reading, face detection},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:b078815ca447a3e4d17e8a2a34f13183ec5dec41&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# gaia_dr3_mvl_v1
+# https://academictorrents.com/details/300605cbbcf8fe47851dd68902b40e825f915bcb
+# 1.47 TiB
+# Citation:
+# @article{,
+#title= {gaia_dr3_mvl_v1},
+#journal= {},
+#author= {Vladimir Dergachev},
+#year= {},
+#url= {https://www.atlas.aei.uni-hannover.de/work/volodya/Gaia_dr3/},
+#abstract= {Gaia DR3 data in MVL format. The MVL stands for Mappable Vector Library and is a file format designed for memory mapping. With a solid state drive, you can map the entire Gaia data into memory and access it at will - even on a small notebook. You can also run parallel computations because the data will be shared between processes running on the same computer.
+#
+#You can find more information and examples at:
+#https://www.atlas.aei.uni-hannover.de/work/volodya/Gaia_dr3/},
+#keywords= {Gaia, MVL, astronomy},
+#terms= {},
+#license= {},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:300605cbbcf8fe47851dd68902b40e825f915bcb&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# MLDS-DS3-10000-v1.0
+# https://academictorrents.com/details/b2bbaccd349e8e2954a438ced6fc01adae4ea1f1
+# 1.35 TiB
+# Citation:
+#@article{,
+#title= {MLDS-DS3-10000-v1.0},
+#journal= {},
+#author= {Clemens, John M.},
+#year= {},
+#url= {https://www.mlcathome.org/mlds.html},
+#abstract= {Machine Learning Dataset, DS3-10000 v1.0: A dataset for parameter-space analysis of neural networks. See https://www.mlcathome.org/ for more information},
+#keywords= {dataset, neural, network, ml},
+#terms= {},
+#license= {CC-BY-SA 4.0},
+#superseded= {}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:b2bbaccd349e8e2954a438ced6fc01adae4ea1f1&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
+
+# PADCHEST_SJ (Feb 2019 Update)
+# https://academictorrents.com/details/dec12db21d57e158f78621f06dcbe78248d14850
+# 1.13 TiB
+# Citation:
+# @article{,
+#title= {PADCHEST_SJ (Feb 2019 Update)},
+#keywords= {chest xray, radiology},
+#author= {},
+#abstract= {This dataset includes more than 160,000 images obtained from 67,000 patients that were interpreted and reported by radiologists at Hospital San Juan Hospital (Spain) from 2009 to 2017, covering six different position views and additional information on image acquisition and patient demography. The reports were labeled with 174 different radiographic findings, 19 differential diagnoses and 104 anatomic locations organized as a hierarchical taxonomy and mapped onto standard Unified Medical Language System (UMLS) terminology.
+#
+#https://i.imgur.com/MpVlYgB.png},
+#terms= {},
+#license= {Creative Commons Attribution-ShareAlike 4.0 International License},
+#superseded= {},
+#url= {https://arxiv.org/abs/1901.07441}
+#}
+# Magnet link:
+magnet:?xt=urn:btih:dec12db21d57e158f78621f06dcbe78248d14850&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce
