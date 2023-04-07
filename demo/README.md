@@ -15,12 +15,39 @@ Directory for coordinating the demo of the `dataprep` tool.
 
 ## Setting up the instance
 
-### Fresh Setup
-This repository assumes you have already installed an image of Ubuntu 22.04 on a Hetzner SX134 instance.
-You should have root access to the instance without a password through an SSH key.
-We assume 120 TiB of storage is available on the instance.
+### Installing the image
+We are using a Hetzner SX134 instance for the demo.
+Hetzner provides a custom provisioning script accessible through their Rescue System.
+See [their docs](https://docs.hetzner.com/robot/dedicated-server/operating-systems/installimage/) for more information.
 
-Our instance is already setup with necessary dependencies.
+Our instance should already be setup with / our tooling assumes the following:
+- Ubuntu 22.04
+- Ability for password-less ssh to a root user (when setting up an admin)
+
+### ZFS
+We utilize ZFS to store our data.
+You may have already formatted the disks on your instance. If they are not formatted with ZFS, you should wipe them by:
+```bash
+# Searching for disks by id
+ls /dev/disk/by-id/ | grep -v part
+# Wiping the HDDs. The RegEx we used looked like: `wwn-0x5000c*`
+# First wipe the filesystems
+for X in $(ls /dev/disk/by-id/<disk-regex>) | grep part) ; do wipefs -a ${X}; done
+# Destroy the partition tables
+for X in $(ls /dev/disk/by-id/<disk-regex>) | grep part) ; do sgdisk -Z ${X}; done
+```
+Then create the ZFS pool. We call ours `tombolo`:
+```bash
+# Create the pool with the HDDs
+zpool create tombolo -o ashift=12 -O atime=off -O recordsize=1M -O sync=disabled -O compression=on /dev/disk/by-id/<disk-regex>
+# Add the SSD
+zpool add tombolo -o ashift=12 special /dev/nvme0n1
+# Set the special_small_blocks property
+zfs set special_small_blocks=32k tombolo
+```
+
+### Demo Setup 
+Our instance is already setup with necessary dependencies to run the demo.
 Should you need to set up the instance you can run:
 
 ```bash
