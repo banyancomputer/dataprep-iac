@@ -113,14 +113,14 @@
         state: present
       when: is_root
 #   This is setup by default on our Hetzner instances, so this is assumed. We keep it here for reference.
-#    - name: Allow the admin group to run any command without a password
-#      become: yes
-#      lineinfile:
-#        path: /etc/sudoers
-#        line: "%admin ALL=(ALL) NOPASSWD: ALL"
-#        state: present
-#        regexp: "^%admin ALL=(ALL) NOPASSWD: ALL"
-#      when: is_root
+    - name: Allow the admin group to run any command without a password
+      become: yes
+      lineinfile:
+        path: /etc/sudoers
+        line: "%admin ALL=(ALL) NOPASSWD: ALL"
+        state: present
+        regexp: "^%admin ALL=(ALL) NOPASSWD: ALL"
+      when: is_root
 
     # Disable root login - lock the door behind us.
     - name: Disable root login
