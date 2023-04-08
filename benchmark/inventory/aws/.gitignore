@@ -1,3 +1,0 @@
-# These files are populated by terraform and should not be edited manually or committed to git
-env.ssh
-host

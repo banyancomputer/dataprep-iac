@@ -1,0 +1,22 @@
+- hosts: all
+  name: Start aria2c on torrenting files
+  tasks:
+    - name: Make sure the dataset path exists
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Copy our torrent file to the host
+      copy:
+        src: "{{ torrent_file_path }}"
+        dest: "{{ input_path }}/torrents.txt"
+    - name: Start aria2c on the host in a tmux session. Alert and signal when done
+      shell: "./torrent.sh {{ input_path }} {{ ifttt_test_webhook_key }}"
+    - debug:
+        msg: "
+          Waiting for the torrent to finish downloading.
+          Feel free to exit this playbook. 
+          If you've set up IFTTT, you'll get a notification when the torrent is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+    - name: Wait for the torrent to finish downloading
+      shell: "tmux wait torrent"

@@ -1,0 +1,72 @@
+- hosts: all
+  name: Generate input for the benchmark using the fake-file tool
+  tasks:
+    # Get version information about the dataprep repo
+    - name: Get the commit hash of the latest commit in the dataprep repo
+      shell: git rev-parse --short HEAD
+      args:
+        chdir: "{{ bench_path }}/dataprep"
+      register: latest_commit_hash
+    - name: Set the latest commit hash
+      set_fact:
+        dataprep_commit_hash: "{{ latest_commit_hash.stdout }}"
+    # Make sure the input path exists and has data in it. Record the contents of the input path
+    - name: Make sure the input path exists
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Register the contents of the input path
+      shell: ls -1 {{ input_path }}
+      register: input_path_contents
+    - fail:
+        msg: "No files found in {{ input_path }}"
+      when: input_path_contents.stdout == ""
+
+
+    - name: Get the current time on the host
+      shell: date +%s
+      register: start_time
+    # Prep the auxiliary paths
+    # Make sure the packed path exists
+    - name: Make sure the packed path exists
+      file:
+        path: "{{ packed_path }}"
+        state: directory
+    # Make sure the unpacked path exists
+    - name: Make sure the unpacked path exists
+      file:
+        path: "{{ unpacked_path }}"
+        state: directory
+    # Make sure the manifest path exists
+    - name: Make sure the manifest path exists
+      file:
+        path: "{{ manifest_path }}"
+        state: directory
+    # Make sure the result path exists
+    - name: Make sure the result path exists
+      file:
+        path: "{{ result_path }}"
+        state: directory
+    # Make sure a place for results exists in the result path
+    - name: Make sure a directory exists in the result path for this run
+      file:
+        path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}"
+        state: directory
+
+    - name: Run the benchmark
+      shell: "./bench.sh \
+        {{ input_path }} \ 
+        {{ packed_path }} \
+        {{ unpacked_path }} \
+        {{ manifest_path }} \
+        {{ result_path }}\{{ dataprep_commit_hash }}\{{ start_time.stdout }} \
+        {{ ifttt_test_webhook_key }}"
+    - debug:
+        msg: "
+         Waiting for the benchmark to finish. 
+         Feel free to exit this playbook. 
+         If you've set up IFTTT, you'll get a notification when the torrent is done.
+         You can check the status of your job by connecting to your user and running `tmux a`.
+       "
+    - name: Wait for the torrent to finish downloading
+      shell: "tmux wait bench"

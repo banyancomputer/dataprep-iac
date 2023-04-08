@@ -1,9 +1,0 @@
-# This holds the current benchmark configuration
-env/env.instance
-env/env.ifttt
-env/env.git
-
-# Ignore results by default
-results/
-
-.DS_Store
