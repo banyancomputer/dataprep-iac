@@ -5,12 +5,24 @@
       file:
         path: "{{ input_path }}"
         state: directory
-    - name: Copy our torrent file to the host
+    - name: Copy our torrent file to the host. Our torrent script expects it to be in the input directory.
       copy:
         src: "{{ torrent_manifest_path }}"
         dest: "{{ input_path }}/torrents.txt"
-    - name: Start aria2c on the host in a tmux session. Alert and signal when done
-      shell: "./torrent.sh {{ input_path }} {{ ifttt_test_webhook_key }}"
+
+    - name: Copy our torrent script to the host
+      copy:
+        src: "../utils/torrent.sh"
+        dest: "/home/{{ ansible_user }}/torrent.sh"
+        mode: '0777'
+
+    - name: Start the torrent in a new tmux session
+      shell: "tmux new -d '
+        /home/{{ ansible_user }}/torrent.sh \
+          {{ input_path }} \
+          {{ ifttt_test_webhook_key }}; \
+        tmux wait -S torrent'"
+
     - debug:
         msg: "
           Waiting for the torrent to finish downloading.

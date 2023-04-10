@@ -11,9 +11,7 @@ IFTTT_TEST_WEBHOOK_KEY=$4
 
 # Start the dataprep job in a new tmux session
 # Send notification to IFTTT when done
-tmux new -d " \
-  dataprep pack -i $INPUT_PATH -o $OUTPUT_PATH -m $MANIFEST_PATH; \
-  curl -X POST -H \"Content-Type: application/json\" -d \
-    '{\"Title\": \"Dataprep Pack\", \"Input\": \"$INPUT_PATH\", \"Output\": \"$OUTPUT_PATH\"}' \
-    https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY; \
-  tmux wait -S pack;"
+dataprep pack -i "$INPUT_PATH" -o "$OUTPUT_PATH" -m "$MANIFEST_PATH";
+curl -X POST -H \"Content-Type: application/json\" -d \
+  "{\"Title\": \"Dataprep Pack\", \"Input\": \"$INPUT_PATH\", \"Output\": \"$OUTPUT_PATH\"}" \
+  https://maker.ifttt.com/trigger/dataprep_event/with/key/"$IFTTT_TEST_WEBHOOK_KEY";

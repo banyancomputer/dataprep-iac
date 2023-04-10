@@ -10,12 +10,11 @@ A library of ansible scripts for managing dependencies, services, users, and tas
 [//]: # (## terraform)
 
 ## hosts
-
-A set of hosts we can target.
+Host files for targetting specific hosts.
 
 ## env
 
-Used to configure tasks submitted to hosts
+Env files used to configure sets of tools
 
 ## scripts
 

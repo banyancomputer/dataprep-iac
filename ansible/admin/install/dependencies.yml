@@ -1,3 +1,4 @@
+# Tools you need to install as a sudoer:
 - hosts: all
   name: Install all dependencies on the host
   tasks:

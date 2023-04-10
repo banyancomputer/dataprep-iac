@@ -6,9 +6,7 @@ INPUT_PATH=$1
 IFTTT_TEST_WEBHOOK_KEY=$2
 
 # Start the torrent job in a new tmux session
-tmux new -d " \
-  aria2c -d $INPUT_PATH --seed-time=0 -Z -i $INPUT_PATH/torrents.txt; \
-  curl -X POST -H \"Content-Type: application/json\" -d \
-    '{\"Title\": \"Torrent done\"}' \
-    https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY; \
-  tmux wait -S torrent;"
+aria2c -d $INPUT_PATH --seed-time=0 -Z -i $INPUT_PATH/torrents.txt;
+curl -X POST -H \"Content-Type: application/json\" -d \
+  "{\"Title\": \"Torrent done\"}" \
+  https://maker.ifttt.com/trigger/dataprep_event/with/key/"$IFTTT_TEST_WEBHOOK_KEY";

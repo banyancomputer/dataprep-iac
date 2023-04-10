@@ -1,0 +1,1 @@
+General utility bash scripts where Ansible is a poor tool.

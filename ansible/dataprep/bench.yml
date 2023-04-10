@@ -53,12 +53,33 @@
         path: "{{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }}"
         state: directory
 
-    # TODO: Make work with TMUX
+    - name: Copy our bench script to the user
+      copy:
+        src: "../utils/bench.sh"
+        dest: "/home/{{ ansible_user }}/bench.sh"
+        mode: '0777'
+
     - name: Run the benchmark
-      shell: "./bench.sh \
-        {{ input_path }} \ 
-        {{ packed_path }} \
-        {{ unpacked_path }} \
-        {{ manifest_path }} \
-        {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }} \
-        {{ ifttt_test_webhook_key }}"
+      shell: "tmux new -d '
+        ./bench.sh \
+          {{ input_path }} \ 
+          {{ packed_path }} \
+          {{ unpacked_path }} \
+          {{ manifest_path }} \
+          {{ result_path }}/{{ dataprep_commit_hash }}/{{ start_time.stdout }} \
+          {{ ifttt_test_webhook_key }}; \
+        tmux wait -S bench;'"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    - debug:
+        msg: "
+          Waiting for the benchmark to finish.
+          Feel free to exit this playbook.
+          If you've set up IFTTT, you'll get a notification when the benchmark is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+
+    - name: Wait for the benchmark to finish
+      shell: "tmux wait bench"
+      ignore_errors: yes

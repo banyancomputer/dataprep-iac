@@ -3,7 +3,7 @@
 . env/env.user
 . env/env.ifttt
 . env/env.host
-. env/env.bench
+. env/env.dataprep
 
 # A helper script to make calling Ansible easier
 export ANSIBLE_HOST_KEY_CHECKING=False

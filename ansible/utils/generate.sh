@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 
 # Get the arguments
 SIZE=$1
@@ -8,13 +9,7 @@ OUTPUT_PATH=$5
 IFTTT_TEST_WEBHOOK_KEY=$6
 
 for strategy in $(echo $LIST | tr "," " "); do
-    fake-file \
-     -s $SIZE \
-     -w $WIDTH \
-     -d  $DEPTH \
-     --strategy "$strategy" \
-     -o $OUTPUT_PATH \
-     -v
+  fake-file -s "$SIZE" -w "$WIDTH" -d  "$DEPTH" --strategy "$strategy" -o "$OUTPUT_PATH" -v;
 done
 curl -X POST -H \"Content-Type: application/json\" -d \
  '{\"Title\": \"Generate done\"}' \

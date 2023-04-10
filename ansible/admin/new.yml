@@ -10,7 +10,6 @@
       set_fact:
         is_root: "{{ whoami.stdout == 'root' }}"
 
-
     - name: Create an admin group if it does not exist
       become: yes
       group:

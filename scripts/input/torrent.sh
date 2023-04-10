@@ -12,7 +12,7 @@ export ANSIBLE_HOST_KEY_CHECKING=False
 export ANSIBLE_CALLBACKS_ENABLED=profile_tasks
 ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$USER" \
-  -e "input_path=$ROOT_PATH/$INPUT_PATH" \
+  -e "input_path=$INPUT_PATH" \
   -e "torrent_manifest_path=$TORRENT_MANIFEST_PATH" \
   -e "ifttt_test_webhook_key=$IFTTT_TEST_WEBHOOK_KEY" \
   ./ansible/input/torrent.yml

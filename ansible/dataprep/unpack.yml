@@ -1,6 +1,15 @@
 - hosts: all
   name: Unpack
   tasks:
+    - dbg:
+        msg: "Running unpack.yml"
+    - dbg:
+        msg: "input_path: {{ input_path }}"
+    - dbg:
+        msg: "output_path: {{ output_path }}"
+    - dbg:
+        msg: "manifest_path: {{ manifest_path }}"
+
     - name: Make sure the unpacked path exists
       file:
         path: "{{ output_path }}"
@@ -23,10 +32,20 @@
         msg: "The manifest path does not exist. Please create the manifest before running this playbook."
       when: not manifest_path_exists.stat.exists
 
-    - name: Unpack the manifest with dataprep in a new tmux session
-      shell: "./unpack.sh {{ output_path }} {{manifest_path }} {{ ifttt_test_webhook_key }}"
+    - name: Copy our unpack script to the user
+      copy:
+        src: "../utils/unpack.sh"
+        dest: "/home/{{ ansible_user }}/unpack.sh"
+        mode: '0777'
+
+    - name: Unpack the dataset with dataprep in a new tmux session
+      shell: "tmux new -d '
+        /home/{{ ansible_user }}/unpack.sh \
+         {{ output_path }} {{manifest_path }} {{ ifttt_test_webhook_key }}; \
+        tmux wait -S unpack'"
       environment:
         PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
     - debug:
         msg: "
               Waiting for unpack job to finish.
@@ -34,6 +53,7 @@
               If you've set up IFTTT, you'll get a notification when the unpacking is done.
               You can check the status of your job by connecting to your user and running `tmux a`.
             "
+
     - name: Wait for dataprep to finish packing the dataset
       shell: "tmux wait unpack"
       ignore_errors: yes

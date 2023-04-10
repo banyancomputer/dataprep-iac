@@ -38,9 +38,8 @@
         path: /etc/exports
         state: touch
 
-
     - name: Make sure the export path exists
       become: yes
       file:
-        path: "{{ export_path }}"
+        path: "/exports"
         state: directory
