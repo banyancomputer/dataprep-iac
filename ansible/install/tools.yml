@@ -3,6 +3,8 @@
   tasks:
     - name: Check if rust is installed
       shell: rustc --version
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
       register: rustc_version
       ignore_errors: yes
     - fail:
@@ -14,7 +16,7 @@
       git:
         repo: "https://github.com/banyancomputer/dataprep.git"
         # If the branch is not specified, use the default branch
-        version: "{{ dataprep_branch | dev }}"
+        version: "{{ dataprep_branch | default(omit) }}"
         dest: "dataprep"
         update: yes
     - name: Install the Dataprep binary

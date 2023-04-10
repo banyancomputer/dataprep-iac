@@ -8,7 +8,6 @@ UNPACKED_PATH=$3
 MANIFEST_PATH=$4
 # Get the result path
 RESULT_PATH=$5
-# Get the Ifttt webhook key
 IFTTT_TEST_WEBHOOK_KEY=$6
 
 
@@ -52,11 +51,7 @@ benchFunc () {
   done
 }
 
-
-# Start the torrent job in a new tmux session
-tmux new -d " \
-  benchFunc; \
-  curl -X POST -H \"Content-Type: application/json\" -d \
-    '{\"Title\": \"Benchmark done\"}' \
-    https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY; \
-  tmux wait -S bench;"
+benchFunc;
+curl -X POST -H \"Content-Type: application/json\" -d \
+ '{\"Title\": \"Generate done\"}' \
+  https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY;

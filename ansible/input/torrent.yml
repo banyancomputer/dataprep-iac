@@ -1,13 +1,13 @@
 - hosts: all
   name: Start aria2c on torrenting files
   tasks:
-    - name: Make sure the dataset path exists
+    - name: Make sure the input path exists
       file:
         path: "{{ input_path }}"
         state: directory
     - name: Copy our torrent file to the host
       copy:
-        src: "{{ torrent_file_path }}"
+        src: "{{ torrent_manifest_path }}"
         dest: "{{ input_path }}/torrents.txt"
     - name: Start aria2c on the host in a tmux session. Alert and signal when done
       shell: "./torrent.sh {{ input_path }} {{ ifttt_test_webhook_key }}"

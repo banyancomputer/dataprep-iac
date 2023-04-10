@@ -2,6 +2,7 @@
 
 . env/env.host
 . env/env.user
+. env/env.nfs
 
 # Get the user name from the first argument
 export READER_NAME=$1
@@ -16,4 +17,5 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$USER" \
   -e "reader_name=$READER_NAME" \
   -e "reader_hostname=$READER_HOSTNAME" \
-  ./ansible/admin/reader.yml
+  -e "export_path=$EXPORT_PATH" \
+  ./ansible/admin/reader/new.yml

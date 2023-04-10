@@ -58,7 +58,7 @@
       lineinfile:
         path: /etc/exports
         backrefs: yes
-        regexp: "^(.*{{ export_path}}.*)$"
+        regexp: "^(.*{{ export_path }}.*)$"
         line: '\1 {{ reader_host_permissions }}'
         state: present
       ignore_errors: yes

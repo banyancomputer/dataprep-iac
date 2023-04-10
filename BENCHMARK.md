@@ -33,12 +33,10 @@ You should make sure that these assumptions are true for your environment before
 [//]: # (TODO: Git versioned benchmarks)
 [//]: # (- Version control is important. The benchmark process will keep track of what commit you are benchmarking, and will save the results of the benchmark in a folder named after that commit.)
 
-- `BENCH_PATH` should hold any artifacts, code, and results related to the benchmark process.
-- The benchmark process is meant to batch a number example inputs and benchmark them together:
-  - When running the benchmark (described below), the benchmark process will iterate over all files and directories in your
-  `INPUT_PATH` and run the end-to-end `pack` and `unpack` process on each one.
-  - So long as the `INPUT_PATH` is a directory, and has at least one file or directory in it, the benchmark will run. 
-  - Results will be saved on the instance under the name of the file or directory that was benchmarked.
+- When running the benchmark (described below), the benchmark process will iterate over all files and directories in your
+`INPUT_PATH` and run the end-to-end `pack` and `unpack` process on each one.
+- So long as the `INPUT_PATH` is a directory, and has at least one file or directory in it, the benchmark will run. 
+- Results will be saved on the instance under the name of the file or directory that was benchmarked.
 - The `PACKED_PATH` is where outputs of `dataprep pack` are placed. It should have enough space to store the output of any `pack` process that is run on the inputs in `INPUT_PATH`. These files are cleaned up after an input is processed.
 - The `UNPACKED_PATH` should have enough space to store the output of any `unpack` process that is run on the inputs in `INPUT_PATH` (It should be at least as large as `INPUT_PATH`). These files are cleaned up after an input is processed.
 - The `MANIFEST_PATH` should have enough space to store any manifests output by `dataprep pack`. These files are cleaned up after an input is processed.
@@ -49,8 +47,6 @@ So long as you setup your inputs and environment to reflect these assumptions, y
 ## Supported instance types
 - hetzner
   - This is an AX101 dedicated server from Hetzner.
-- local
-  - This is your local machine.
 
 ## Setting up your environment 
 Read the documentation for your instance type in `inventory/<instance_type>/README.md`.

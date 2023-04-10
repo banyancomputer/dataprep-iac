@@ -1,4 +1,4 @@
-- host: all
+- hosts: all
   name: Create an admin user on the host
   tasks:
     - name: Are we running as root?

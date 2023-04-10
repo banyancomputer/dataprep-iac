@@ -1,11 +1,3 @@
-# Generate input for the benchmark using the fake-file tool
-# -e input_path=/home/dataprep/input
-# -e file_structures=Simple,Deep,...
-# -e file_structures_size=1024
-# -e file_structures_max_width=2
-# -e file_structures_max_depth=2
-# -e ifttt_test_webhook_key=...
-
 - hosts: all
   name: Generate input for the benchmark using the fake-file tool
   tasks:
@@ -22,22 +14,26 @@
               file_structures_size: {{ file_structures_size }}
               file_structures_max_width: {{ file_structures_max_width }}
               file_structures_max_depth: {{ file_structures_max_depth }}"
+    # TODO: spawn as TMUX job
 
+#    - name: Copy our input TMUX job to the user
+#      copy:
+#        src: "../utils/generate.sh"
+#        dest: "/home/{{ ansible_user }}/generate.sh"
+#        mode: '0777'
 
-    - name: Generate Input in at the input path
-      shell: "./generate.sh \
-        {{ file_structures_size }} \
-        {{ file_structures_max_width }} \
-        {{ file_structures_mex_depth }} \
-        {{ strategy_list }} \
-        {{ input_path }} \
-        {{ ifttt_test_webhook_key }}"
-    - debug:
-        msg: "
-         Waiting for the input to be generated
-         Feel free to exit this playbook. 
-         If you've set up IFTTT, you'll get a notification when the torrent is done.
-         You can check the status of your job by connecting to your user and running `tmux a`.
-       "
-    - name: Wait for the torrent to finish downloading
-      shell: "tmux wait generate"
+    - name: Generating input, this may take a while.
+      shell: "/home/{{ ansible_user }}/generate.sh \
+              {{ file_structures_size }} \
+              {{ file_structures_max_width }} \
+              {{ file_structures_max_depth }} \
+              {{ file_structures }} \
+              {{ input_path }} \
+              {{ ifttt_test_webhook_key }}"
+#      shell: "./generate.sh \
+#              {{ file_structures_size }} \
+#              {{ file_structures_max_width }} \
+#              {{ file_structures_max_depth }} \
+#              {{ file_structures }} \
+#              {{ input_path }} \
+#              {{ ifttt_test_webhook_key }}"
