@@ -25,6 +25,9 @@ benchFunc () {
     # Get the name of the input
     input_name=$(basename -- "$input")
     # Time how long it takes to pack the input
+
+    mkdir -p "$RESULT_PATH"/"$input_name"
+
     { time dataprep \
       pack \
       -i "$input" \
@@ -51,6 +54,11 @@ benchFunc () {
 }
 
 benchFunc > "$RESULT_PATH"/bench.log
+
+rm -rf "${PACKED_PATH:?}"/*
+rm -rf "${UNPACKED_PATH:?}"/*
+rm -rf "${MANIFEST_PATH:?}"/*
+
 curl -X POST -H \"Content-Type: application/json\" -d \
  '{\"Title\": \"Benchmark done\"}' \
   https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY;

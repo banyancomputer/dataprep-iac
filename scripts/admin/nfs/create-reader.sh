@@ -17,5 +17,5 @@ ansible-playbook -i "$ANSIBLE_INVENTORY" \
   -u "$USER" \
   -e "reader_name=$READER_NAME" \
   -e "reader_hostname=$READER_HOSTNAME" \
-  -e "export_path=$EXPORT_PATH" \
+  -e "export_path=/exports" \
   ./ansible/admin/nfs/reader.yml
