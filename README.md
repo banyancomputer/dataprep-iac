@@ -35,6 +35,8 @@ See the [README](BENCHMARK.md) for more information.
 
 ### demo
 
+WARNING: Outdated docs
+
 Used to configure, generate data for, and run a demo of the `dataprep` tool.
 Designed to target a Hetzner SX134 instance and integrate with NFS client for sharing output.
 See the [README](DEMO.md) for more information.

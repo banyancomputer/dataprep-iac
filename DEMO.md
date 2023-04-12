@@ -1,4 +1,6 @@
-# dataprep-iac: demo
+# dataprep-iac: demo: OUTDATED
+
+*Some scripts have moved and new locations have yet to be documented.*
 
 Directory for coordinating the demo of the `dataprep` tool.
 
@@ -48,16 +50,25 @@ zfs set special_small_blocks=32k tombolo
 
 ### Demo Setup 
 Our instance is already setup with necessary dependencies to run the demo.
-Should you need to set up the instance you can run:
 
-```bash
-# Create an admin user
-./scripts/user.sh admin <path_to_public_key>
-```
-```bash
-# Set up the instance
-./scripts/setup.sh
-```
+[//]: # (Should you need to set up the instance you can run:)
+
+[//]: # ()
+[//]: # (```bash)
+
+[//]: # (# Create an admin user)
+
+[//]: # (./scripts/user.sh admin <path_to_public_key>)
+
+[//]: # (```)
+
+[//]: # (```bash)
+
+[//]: # (# Set up the instance)
+
+[//]: # (./scripts/setup.sh)
+
+[//]: # (```)
 
 ### Connecting to the instance
 We currently have the following Hetzner hosts setup:

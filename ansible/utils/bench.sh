@@ -8,6 +8,7 @@ UNPACKED_PATH=$3
 MANIFEST_PATH=$4
 # Get the result path
 RESULT_PATH=$5
+# Get the IFTTT key (if provided)
 IFTTT_TEST_WEBHOOK_KEY=$6
 
 
@@ -16,7 +17,6 @@ IFTTT_TEST_WEBHOOK_KEY=$6
 # Record how long it takes and the size of the input and output
 # Record the size of the manifest
 benchFunc () {
-  echo "Benchmarking dataprep pack and unpack"
   echo "Benching following inputs:"
   ls "$INPUT_PATH"
 
@@ -28,12 +28,15 @@ benchFunc () {
 
     mkdir -p "$RESULT_PATH"/"$input_name"
 
+    echo "Packing $input_name"
+
     { time dataprep \
       pack \
       -i "$input" \
       -o "$PACKED_PATH"/"$input_name".packed \
       -m "$MANIFEST_PATH"/"$input_name".json; } 2> "$RESULT_PATH"/"$input_name"/pack
 
+    echo "Unpacking $input_name"
     # Time how long it takes to unpack the input
     { time dataprep \
       unpack \
@@ -53,12 +56,13 @@ benchFunc () {
   done
 }
 
-benchFunc > "$RESULT_PATH"/bench.log
-
+echo "Benchmarking dataprep pack and unpack"
+benchFunc;
+echo "Cleaning up"
 rm -rf "${PACKED_PATH:?}"/*
 rm -rf "${UNPACKED_PATH:?}"/*
 rm -rf "${MANIFEST_PATH:?}"/*
-
+echo "Done!"
 curl -X POST -H \"Content-Type: application/json\" -d \
  '{\"Title\": \"Benchmark done\"}' \
   https://maker.ifttt.com/trigger/dataprep_event/with/key/$IFTTT_TEST_WEBHOOK_KEY;
