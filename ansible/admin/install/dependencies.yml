@@ -1,0 +1,28 @@
+# Tools you need to install as a sudoer:
+- hosts: all
+  name: Install all dependencies on the host
+  tasks:
+    # Install the dependencies - Doesn't check if they are already installed
+    # Update Yum
+    - name: Update Apt
+      become: yes
+      apt:
+        name: "*"
+        state: latest
+        force_apt_get: true
+    # Install Dependencies
+    - name: Install Dependencies
+      become: yes
+      apt:
+        name: "{{ item }}"
+        state: present
+        force_apt_get: true
+      with_items:
+      # These cover multiple roles and functionality
+        - gcc
+        - git
+        - aria2
+        - tmux
+        - nfs-kernel-server
+        - nfs-common
+        - rsync

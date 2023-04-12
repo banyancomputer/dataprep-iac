@@ -1,0 +1,8 @@
+# A file of magic links that arai2c can use to download files from the internet
+# Please document the source of each magnet link
+
+# Reddit subreddit list
+# https://academictorrents.com/details/bdcd92135f8718d4920801bd474638c4708f0995
+# 250 MiB
+# Magnet link:
+magnet:?xt=urn:btih:bdcd92135f8718d4920801bd474638c4708f0995&tr=https%3A%2F%2Facademictorrents.com%2Fannounce.php&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce

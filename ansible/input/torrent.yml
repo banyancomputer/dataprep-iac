@@ -1,0 +1,34 @@
+- hosts: all
+  name: Start aria2c on torrenting files
+  tasks:
+    - name: Make sure the input path exists
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Copy our torrent file to the host. Our torrent script expects it to be in the input directory.
+      copy:
+        src: "{{ torrent_manifest_path }}"
+        dest: "{{ input_path }}/torrents.txt"
+
+    - name: Copy our torrent script to the host
+      copy:
+        src: "../utils/torrent.sh"
+        dest: "/home/{{ ansible_user }}/torrent.sh"
+        mode: '0777'
+
+    - name: Start the torrent in a new tmux session
+      shell: "tmux new -d '
+        /home/{{ ansible_user }}/torrent.sh \
+          {{ input_path }} \
+          {{ ifttt_test_webhook_key }}; \
+        tmux wait -S torrent'"
+
+    - debug:
+        msg: "
+          Waiting for the torrent to finish downloading.
+          Feel free to exit this playbook. 
+          If you've set up IFTTT, you'll get a notification when the torrent is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+    - name: Wait for the torrent to finish downloading
+      shell: "tmux wait torrent"

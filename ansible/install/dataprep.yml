@@ -1,0 +1,27 @@
+- hosts: all
+  name: Install Dataprep for a user
+  tasks:
+    - name: Check if rust is installed
+      shell: rustc --version
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+      register: rustc_version
+      ignore_errors: yes
+    - fail:
+        msg: "Rust is not installed. Please run the rust.yml playbook first."
+      when: rustc_version.rc != 0
+
+    # Clone and install the Dataprep repo
+    - name: Clone the dataprep repo
+      git:
+        repo: "https://github.com/banyancomputer/dataprep.git"
+        # If the branch is not specified, use the default branch
+        version: "{{ dataprep_branch | default(omit) }}"
+        dest: "dataprep"
+        update: yes
+    - name: Install the Dataprep binary
+      shell: cargo install --path dataprep
+      args:
+        chdir: "dataprep"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"

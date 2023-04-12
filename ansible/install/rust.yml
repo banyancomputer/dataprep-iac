@@ -1,0 +1,24 @@
+- hosts: all
+  name: Install Rust for a user
+  tasks:
+    # Download and install Rustup
+    - name: Download Rustup Installer
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /tmp/rustup.rs
+        mode: '0755'
+        force: 'yes'
+      tags:
+        - rust
+    - name: install rust/cargo
+      shell: /tmp/rustup.rs -y
+      tags:
+        - rust
+    - name: Remove Rustup Installer
+      file:
+        path: /tmp/rustup.rs
+        state: absent
+    - name: Install the nightly version of rust. Needed for Dataprep
+      shell: rustup toolchain install nightly
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"

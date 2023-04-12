@@ -1,0 +1,1 @@
+Playbook for installing stuff for all users you need to have sudo access to install

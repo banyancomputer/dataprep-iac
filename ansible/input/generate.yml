@@ -1,0 +1,45 @@
+- hosts: all
+  name: Generate input for the benchmark using the fake-file tool
+  tasks:
+    - name: Create the input directory if it doesn't exist
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Log the generation parameters to the controller
+      debug:
+        msg: "Generating Input with parameters at {{ input_path }}:
+              input_path: {{ input_path }}
+              file_structures: {{ file_structures }}
+              file_structures_size: {{ file_structures_size }}
+              file_structures_max_width: {{ file_structures_max_width }}
+              file_structures_max_depth: {{ file_structures_max_depth }}"
+
+    - name: Copy our input generation script to the user
+      copy:
+        src: "../utils/generate.sh"
+        dest: "/home/{{ ansible_user }}/generate.sh"
+        mode: '0777'
+
+    - name: Generate the input in a new tmux session
+      shell: "tmux new -d '
+        /home/{{ ansible_user }}/generate.sh \
+          {{ file_structures_size }} \
+          {{ file_structures_max_width }} \
+          {{ file_structures_max_depth }} \
+          {{ file_structures }} \
+          {{ input_path }} \
+          {{ ifttt_test_webhook_key }}; \
+        tmux wait -S generate'"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    - debug:
+        msg: "
+          Waiting for the input generation to finish.
+          Feel free to exit this playbook.
+          If you've set up IFTTT, you'll get a notification when the input generation is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+
+    - name: Wait for the input generation to finish
+      shell: "tmux wait generate"

@@ -1,0 +1,61 @@
+- hosts: all
+  name: Pack
+  tasks:
+    - dbg:
+        msg: "Running pack.yml"
+    - dbg:
+        msg: "input_path: {{ input_path }}"
+    - dbg:
+        msg: "output_path: {{ output_path }}"
+    - dbg: 
+        msg: "manifest_path: {{ manifest_path }}"
+  
+    - name: Make sure the input path exists
+      file:
+        path: "{{ input_path }}"
+        state: directory
+    - name: Check if the output path is empty
+      shell: "ls -A {{ output_path }}"
+      register: packed_path_contents
+      ignore_errors: yes
+    - name: If the output path is not empty, fail
+      fail:
+        msg: "Tha path you want to pack to us not empty. Please delete the contents of the packed path before running this playbook."
+      when: packed_path_contents.stdout != ""
+    - name: Check if the manifest path exists
+      stat:
+        path: "{{ manifest_path }}"
+      register: manifest_path_exists
+    - name: If the manifest path exists, fail
+      fail:
+        msg: "The manifest path exists. Please delete the manifest before running this playbook."
+      when: manifest_path_exists.stat.exists
+
+    - name: Copy our pack script to the user
+      copy:
+        src: "../utils/pack.sh"
+        dest: "/home/{{ ansible_user }}/pack.sh"
+        mode: '0777'
+
+    - name: Pack the dataset with dataprep in a new tmux session
+      shell: "tmux new -d '
+        /home/{{ ansible_user }}/pack.sh \
+          {{ input_path }} \
+          {{ output_path }} \
+          {{ manifest_path }} \
+          {{ ifttt_test_webhook_key }}; \
+        tmux wait -S pack'"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+
+    - debug:
+        msg: "
+          Waiting for dataprep to finish packing the input.
+          Feel free to exit this playbook.
+          If you've set up IFTTT, you'll get a notification when the packing is done.
+          You can check the status of your job by connecting to your user and running `tmux a`.
+        "
+
+    - name: Wait for dataprep to finish packing the dataset
+      shell: "tmux wait pack"
+      ignore_errors: yes

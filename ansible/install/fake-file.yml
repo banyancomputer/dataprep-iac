@@ -1,0 +1,25 @@
+- hosts: all
+  name: Install Dataprep for a user
+  tasks:
+    - name: Check if rust is installed
+      shell: rustc --version
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"
+      register: rustc_version
+      ignore_errors: yes
+    - fail:
+        msg: "Rust is not installed. Please run the rust.yml playbook first."
+      when: rustc_version.rc != 0
+
+    # Clone and install the Fake-File repo
+    - name: Clone the fake-file repo
+      git:
+        repo: https://github.com/banyancomputer/fake-file.git
+        dest: "fake-file"
+        update: yes
+    - name: Install the fake-file binary
+      shell: cargo +nightly install  --path .
+      args:
+        chdir: "fake-file"
+      environment:
+        PATH: "{{ ansible_env.PATH }}:{{ ansible_env.HOME }}/.cargo/bin"

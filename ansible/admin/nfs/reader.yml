@@ -1,0 +1,69 @@
+- hosts: all
+  name: Set a user that can read data over NFS
+  tasks:
+    - name: Create an reader group if it does not exist
+      become: yes
+      group:
+        name: reader
+        state: present
+    - name: Generate a random password
+      set_fact:
+        # You really shouldn't need this for anything
+        user_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+    - name: Create the user and add them to the reader group
+      become: yes
+      user:
+        name: "{{ reader_name }}"
+        password: "{{ user_password }}"
+        shell: /bin/bash
+        update_password: always
+        state: present
+        groups: reader
+    - name: Make reader the user's primary group
+      become: yes
+      shell: "usermod -g reader {{ reader_name }}"
+    - name: Save the user's password to a file on the instance
+      become: yes
+      copy:
+        content: "{{ user_password }}"
+        dest: /home/{{ reader_name }}/{{ reader_name }}.password
+        mode: '0600'
+        owner: "{{ reader_name }}"
+        group: "reader"
+
+    # Readers shouldn't require ssh access, so don't bother setting up ssh keys
+    # if it hasn't been done already
+    # Do allow them to read the data they need to read
+    - name: Get the user's uid
+      become: yes
+      shell: "id -u {{ reader_name }}"
+      register: user_uid
+    - name: Get the user's gid
+      become: yes
+      shell: "id -g {{ reader_name }}"
+      register: user_gid
+    - name: Add the user's hostname to the /etc/hosts.readers file
+      become: yes
+      lineinfile:
+        path: /etc/hosts.readers
+        line: "{{ reader_hostname }}"
+        state: present
+      ignore_errors: yes
+    - name: Set a string describing the readers permissions
+      set_fact:
+        # They can read everything in the exports directory
+        reader_host_permissions: "{{ reader_hostname }}(ro,all_squash,anonuid={{ user_uid.stdout }},anongid={{ user_gid.stdout }})"
+    - name: Add the reader to /etc/exports
+      become: yes
+      lineinfile:
+        path: /etc/exports
+        backrefs: yes
+        regexp: "^(.*/exports.*)$"
+        line: '\1 {{ reader_host_permissions }}'
+        state: present
+      ignore_errors: yes
+    - name: Run exportfs
+      become: yes
+      shell: "exportfs -a"
+      ignore_errors: yes
+
